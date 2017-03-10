@@ -4,7 +4,7 @@ from connection import connection
 
 class AddressBook(object):
 
-    url = '/v2/address-books'
+    end_point = '/v2/address-books'
     id = None
     name = None
     visibility = constants.ADDRESSBOOK_VISIBILITY_PRIVATE
@@ -36,9 +36,9 @@ class AddressBook(object):
             'name': name,
             'visibility': visibility
         }
-        response = connection.post(cls.url, payload)
+        response = connection.post(cls.end_point, payload)
 
-        return cls(name, visibility=visibility, id=response['id'])
+        return cls(name, **response)
 
     def delete(self):
         """
@@ -55,7 +55,7 @@ class AddressBook(object):
 
         # Attempt to issue the delete request to DotMailer to remove the
         # address book
-        response = connection.delete(self.url+str(self.id))
+        response = connection.delete(self.end_point + str(self.id))
 
         # Clear the current ID value so we can't accidently call this
         # delete call multiple times
@@ -102,7 +102,7 @@ class AddressBook(object):
             raise Exception()
 
         response = connection.get(
-            '{}/{}'.format(cls.url, id)
+            '{}/{}'.format(cls.end_point, id)
         )
         return cls(response['name'], **response)
 
@@ -125,7 +125,8 @@ class AddressBook(object):
         """
         # TODO: Add some validation in for the parameter data types
         response = connection.get(
-            '{}?Select={}&Skip={}'.format(cls.url, select, skip)
+            cls.end_point,
+            query_params={'Select': select, 'Skip':skip}
         )
         return [ cls(entry['name'], **entry) for entry in response]
 
@@ -133,7 +134,8 @@ class AddressBook(object):
     def get_private(cls, select=1, skip=0):
         # TODO: Add some validation in for the parameter data types
         response = connection.get(
-            '{}/private?Select={}&Skip={}'.format(cls.url, select, skip)
+            cls.end_point + '/private',
+            query_params={'Select': select, 'Skip':skip}
         )
         return [ cls(entry['name'], **entry) for entry in response]
 
@@ -141,7 +143,8 @@ class AddressBook(object):
     def get_public(cls, select=1, skip=0):
         # TODO: Add some validation in for the parameter data types
         response = connection.get(
-            '{}/public?Select={}&Skip={}'.format(cls.url, select, skip)
+            cls.end_point + '/public',
+            query_params={'Select': select, 'Skip':skip}
         )
         return [cls(entry['name'], **entry) for entry in response]
 

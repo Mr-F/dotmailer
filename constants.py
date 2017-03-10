@@ -4,8 +4,19 @@ class ConstError(TypeError):
 class Constants(object):
 
     def __init__(self):
+
+        # Address book constants
         self.ADDRESSBOOK_VISIBILITY_PRIVATE = 'Private'
         self.ADDRESSBOOK_VISIBILITY_PUBLIC = 'Public'
+
+        # Contact constants
+        self.CONTACT_OPTINTYPE_UNKNOWN = 'Unknown'
+        self.CONTACT_OPTINTYPE_SINGLE = 'Single'
+        self.CONTACT_OPTINTYPE_DOUBLE = 'Double'
+        self.CONTACT_OPTINTYPE_VERIFIEDDOUBLE = 'VerifiedDouble'
+
+        self.CONTACT_EMAILTYPE_PLAIN = 'PlainText'
+        self.CONTACT_EMAILTYPE_HTML = 'Html'
 
 
 
