@@ -21,26 +21,24 @@ class Contact(object):
                                      constants.CONTACT_EMAILTYPE_HTML)
         self.data_fields = kwargs.get('dataTypes', None)
 
-    @classmethod
-    def create(cls, email, optin_type, email_type):
+    def create(self):
         """
         Creates a contact
 
-        :param email:
-        :param optin_type:
-        :param email_type:
         :return:
         """
         response = connection.post(
-            cls.end_point,
+            self.end_point,
             {
-                'Email': email,
-                'OptInType': optin_type,
-                'EmailType': email_type,
+                'Email': self.email,
+                'OptInType': self.optin_type,
+                'EmailType': self.email_type,
                 # TODO: Add support for data fields
             }
         )
-        return cls(response['email'], **response)
+        for key in response.keys():
+            setattr(self, key, response[key])
+        return self
 
     def delete(self):
         """
@@ -58,6 +56,7 @@ class Contact(object):
         # Clear the current ID value so we can't accidently call this
         # delete call multiple times
         self.id = None
+        return self
 
     def update(self):
         """
@@ -78,6 +77,7 @@ class Contact(object):
                 # TODO: Add support for data fields
             }
         )
+        return self
 
     def add_to_address_book(self, address_book):
         """
@@ -243,3 +243,66 @@ class Contact(object):
         # doesn't exist on DotMailer
         if self.id is None or self.id < 1:
             raise Exception(message)
+
+
+class ContactDataField(object):
+
+    end_point = '/v2/data-fields'
+    id = None
+    name = None
+    type = None
+    visibility = constants.VISIBILITY_PRIVATE
+    default_value = None
+
+    def __init__(self, name, type, **kwargs):
+        self.name = name
+        self.type = type
+        self.id = kwargs.get('id', None)
+        self.visibility = kwargs.get('visibility',
+                                     constants.VISIBILITY_PRIVATE)
+        self.default_value = kwargs.get('default_value', None)
+
+
+    def create(self):
+        """
+        Creates a contact data field within the account
+
+        :return:
+        """
+        response = connection.post(
+            self.end_point,
+            {
+                'Name': self.name,
+                'Type': self.type,
+                'Visibility': self.visibility,
+                'DefaultValue': self.default_value
+            }
+        )
+        for key in response.keys():
+            setattr(self, key, response[key])
+        return self
+
+    def delete(self):
+        """
+        Deletes a contact data field within the account
+
+        :return:
+        """
+        response = connection.delete(
+            '{}/{}'.format(
+                self.end_point, self.name
+            )
+        )
+
+    @classmethod
+    def get_all(cls):
+        """
+        Lists all contact data fields within the account
+
+        :return:
+        """
+        response = connection.get(
+            cls.end_point
+        )
+        return [ContactDataField(entry['name'], entry['type'], **entry)
+                for entry in response]

@@ -7,41 +7,35 @@ class AddressBook(object):
     end_point = '/v2/address-books'
     id = None
     name = None
-    visibility = constants.ADDRESSBOOK_VISIBILITY_PRIVATE
+    visibility = constants.VISIBILITY_PRIVATE
 
     def __init__(self, name, **kwargs):
         self.name = name
         self.id = kwargs.get('id', None)
         self.visibility = kwargs.get(
-            'visibility', constants.ADDRESSBOOK_VISIBILITY_PRIVATE)
+            'visibility', constants.VISIBILITY_PRIVATE)
 
-    @classmethod
-    def create(cls, name, visibility=constants.ADDRESSBOOK_VISIBILITY_PRIVATE):
+    def create(self):
         """
         Creates an address book
 
-        :param name: The name of the address book you're creating, which
-        needs to be included within the request body. It can't be an
-        existing address book's name, 'Test' or 'All contacts'. There is
-        a limit of 128 characters.
-        :param visibility: All address books are created as 'Private' by
-        default but you can set it as 'Public' upon creation should you
-        wish to. This needs to be included within the request body.
         :return:
         """
 
-        if not AddressBook.valid_name(name):
+        if not self.valid_name(self.name):
             raise Exception()
 
         response = connection.post(
-            cls.end_point,
+            self.end_point,
             {
-                'name': name,
-                'visibility': visibility
+                'name': self.name,
+                'visibility': self.visibility
             }
         )
 
-        return cls(name, **response)
+        for key in response.keys():
+            setattr(self, key, response[key])
+        return self
 
     def delete(self):
         """
@@ -62,6 +56,7 @@ class AddressBook(object):
         # Clear the current ID value so we can't accidently call this
         # delete call multiple times
         self.id = None
+        return self
 
     def update(self):
         """
@@ -92,6 +87,7 @@ class AddressBook(object):
                 'visibility': self.visibility
             }
         )
+        return self
 
     @classmethod
     def get(cls, id):

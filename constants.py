@@ -5,11 +5,10 @@ class Constants(object):
 
     def __init__(self):
 
-        # Address book constants
-        self.ADDRESSBOOK_VISIBILITY_PRIVATE = 'Private'
-        self.ADDRESSBOOK_VISIBILITY_PUBLIC = 'Public'
 
-        # Contact constants
+        self.VISIBILITY_PRIVATE = 'Private'
+        self.VISIBILITY_PUBLIC = 'Public'
+
         self.CONTACT_OPTINTYPE_UNKNOWN = 'Unknown'
         self.CONTACT_OPTINTYPE_SINGLE = 'Single'
         self.CONTACT_OPTINTYPE_DOUBLE = 'Double'
@@ -17,6 +16,11 @@ class Constants(object):
 
         self.CONTACT_EMAILTYPE_PLAIN = 'PlainText'
         self.CONTACT_EMAILTYPE_HTML = 'Html'
+
+        self.TYPE_STRING = 'String'
+        self.TYPE_NUMERIC = 'Numeric'
+        self.TYPE_DATE = 'Date'
+        self.TYPE_BOOLEAN = 'Boolean'
 
 
 
