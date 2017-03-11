@@ -18,6 +18,7 @@ class AddressBook(object):
     @classmethod
     def create(cls, name, visibility=constants.ADDRESSBOOK_VISIBILITY_PRIVATE):
         """
+        Creates an address book
 
         :param name: The name of the address book you're creating, which
         needs to be included within the request body. It can't be an
@@ -32,26 +33,27 @@ class AddressBook(object):
         if not AddressBook.valid_name(name):
             raise Exception()
 
-        payload = {
-            'name': name,
-            'visibility': visibility
-        }
-        response = connection.post(cls.end_point, payload)
+        response = connection.post(
+            cls.end_point,
+            {
+                'name': name,
+                'visibility': visibility
+            }
+        )
 
         return cls(name, **response)
 
     def delete(self):
         """
+        Deletes an address book
 
         :return:
         """
 
-        # TODO: Turn this into a decorator would be a good idea
-        # If this object has no id specified then raise an exception as
-        # you aren't able to issue a delete for an address book which
-        # doesn't exist on DotMailer
-        if id is None:
-            raise Exception()
+        # Validate that we should be able to perform a delete on this
+        # AddressBook object based on a valid ID value being defined
+        self.validate_id('Sorry unable to delete address book as no ID value'
+                         'is defined for it')
 
         # Attempt to issue the delete request to DotMailer to remove the
         # address book
@@ -61,8 +63,9 @@ class AddressBook(object):
         # delete call multiple times
         self.id = None
 
-    def update(self, name, visibility=constants.ADDRESSBOOK_VISIBILITY_PRIVATE):
+    def update(self):
         """
+        Updates an address book
 
         :param name: The name of the address book you're creating, which
         needs to be included within the request body. It can't be an
@@ -74,25 +77,31 @@ class AddressBook(object):
         :return:
         """
 
-        # TODO: Turn this into a decorator would be a good idea
-        # If this object has no id specified then raise an exception as
-        # you aren't able to issue a delete for an address book which
-        # doesn't exist on DotMailer
-        if id is None:
+        self.validate_id('Sorry unable to update this address book as no ID'
+                         'value has been defined.')
+
+        if not self.valid_name(self.name):
             raise Exception()
 
-        if not self.valid_name(name):
-            raise Exception()
-
-        pass
+        response = connection.put(
+            '{}/{}'.format(
+                self.end_point, self.id
+            ),
+            {
+                'name': self.name,
+                'visibility': self.visibility
+            }
+        )
 
     @classmethod
     def get(cls, id):
         """
+        Gets an address book by ID
 
         :param id: The ID of the address book
         :return:
         """
+
         # Cast the ID parameter to an integer
         id = int(id)
 
@@ -109,6 +118,10 @@ class AddressBook(object):
     @classmethod
     def get_multiple(cls, select=1000, skip=0):
         """
+        Gets all address books within the specified limits.  This function
+        performs a query to return all the address books, limited by the
+        select and skip values.  To easily get all the address books
+        associated with the account call :get_all:`~AddressBook.get_all`.
 
         :param select: The select parameter requires a number between 1
         and 1000 (0 is not a valid number). You may only select a maximum
@@ -132,6 +145,13 @@ class AddressBook(object):
 
     @classmethod
     def get_private(cls, select=1000, skip=0):
+        """
+        Gets all private address books
+
+        :param select:
+        :param skip:
+        :return:
+        """
         # TODO: Add some validation in for the parameter data types
         response = connection.get(
             cls.end_point + '/private',
@@ -141,6 +161,13 @@ class AddressBook(object):
 
     @classmethod
     def get_public(cls, select=1000, skip=0):
+        """
+        Gets all public address books
+
+        :param select:
+        :param skip:
+        :return:
+        """
         # TODO: Add some validation in for the parameter data types
         response = connection.get(
             cls.end_point + '/public',
@@ -149,12 +176,31 @@ class AddressBook(object):
         return [cls(entry['name'], **entry) for entry in response]
 
     @classmethod
-    def get_all(cls):
+    def get_all(cls, type='All'):
+        """
+        Automatically performs all the requests needed to return every
+        single address book associated with your account.  This fucntion
+        wraps the :get_multiple: address book function and continues to
+        ask for more address books until either none are returned or the
+        list returned is shorter than the number being requested.
+
+        :param type: Either 'All', 'Private' or 'Public', depending on
+        if you want every address book, all your private or all your
+        public address books.
+        :return:
+        """
+        if type == 'Private':
+            address_book_function = cls.get_private
+        elif type == 'Public':
+            address_book_function = cls.get_public
+        else:
+            address_book_function = cls.get_multiple
+
         all_address_books = []
 
         select = 1000
         skip = 0
-        address_books = cls.get_multiple(select, skip)
+        address_books = address_book_function(select, skip)
         num_of_entries = len(address_books)
         while num_of_entries > 0:
             all_address_books.extend(address_books)
@@ -166,75 +212,88 @@ class AddressBook(object):
 
             # Otherwise increment the skip value and request again
             skip += select
-            address_books = cls.get_multiple(select, skip)
+            address_books = address_book_function(select, skip)
             num_of_entries = len(address_books)
 
         return all_address_books
 
     def add_contact(self, contact):
         """
-        This function allows the caller to add a contact (represented by
-        a Contact object) to an existing address book.
+        Adds a contact to a given address book
 
         :param contact:
         :return:
         """
 
-        # TODO: Turn this into a decorator would be a good idea
-        # If this object has no id specified then raise an exception as
-        # you aren't able to issue a delete for an address book which
-        # doesn't exist on DotMailer
-        if id is None:
-            raise Exception()
+        self.validate_id('Sorry, unable to add contact to the address book'
+                         'as no ID value has been defined for the address '
+                         'book.')
 
-        payload = {
-            'Email': contact.email,
-            'OptInType': contact.optin_type,
-            'EmailType': contact.email_type,
-            # TODO: Add support for data fields
-        }
         connection.post(
             self.end_point + '/' + str(self.id),
-            payload
+            {
+                'Email': contact.email,
+                'OptInType': contact.optin_type,
+                'EmailType': contact.email_type,
+                # TODO: Add support for data fields
+            }
         )
 
     def delete_contact(self, contact):
         """
+        Deletes a contact from a given address book
 
         :param contact:
         :return:
         """
-        # TODO: Turn this into a decorator would be a good idea
-        # If this object has no id specified then raise an exception as
-        # you aren't able to issue a delete for an address book which
-        # doesn't exist on DotMailer
-        if id is None:
-            raise Exception()
+        self.validate_id('Sorry, unable to delete contact from this address'
+                         'book, as no ID value has been defined for the '
+                         'address book.')
 
-        if contact.id is None:
-            raise Exception()
+        contact.validate_id('Sorry, unable to delete this contact from the'
+                            'address book, as the contact has no ID value.')
 
         response = connection.delete(
             '{}/{}/contacts/{}'.format(
                 self.end_point, self.id, contact.id
             )
         )
+
         return True
 
-    def delete_all_contacts(self):
-        # TODO: Turn this into a decorator would be a good idea
-        # If this object has no id specified then raise an exception as
-        # you aren't able to issue a delete for an address book which
-        # doesn't exist on DotMailer
-        if id is None:
-            raise Exception()
+    def delete_multiple_contacts(self, id_list):
+        """
+        Deletes multiple contacts from an address book
 
+        :param id_list:
+        :return:
+        """
+        self.validate_id('Sorry, unable to delete contacts from this address'
+                         'book, as no ID value has been defined for the '
+                         'address book.')
+        response = connection.post(
+            '{}/{}/contacts/delete'.format(
+                self.end_point, self.id
+            ),
+            id_list
+        )
+
+    def delete_all_contacts(self):
+        """
+        Deletes all contacts from a given address book
+
+        :return:
+        """
+        self.validate_id('Sorry, unable to delete all contacts from this '
+                         'address book, as no ID value has been defined for'
+                         'the address book.')
         response = connection.delete(
             '{}/{}/contacts'.format(
                 self.end_point, self.id
             )
         )
         return True
+
     @staticmethod
     def valid_name(value):
         """
@@ -247,3 +306,13 @@ class AddressBook(object):
         """
 
         return len(value) <= 128
+
+    def validate_id(self, message):
+
+        # TODO: Add some type checking in here to help catch potential errors
+
+        # If this object has no id specified then raise an exception as
+        # you aren't able to issue a delete for an address book which
+        # doesn't exist on DotMailer
+        if self.id is None or self.id < 1:
+            raise Exception(message)

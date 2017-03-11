@@ -12,22 +12,43 @@ class DotMailerConnection(object):
         self.username = username
         self.password = password
 
-    def post(self, url, payload):
-        payload = json.dumps(payload)
-
-    def delete(self, end_point):
-        pass
-
-    def get(self, end_point, query_params=None):
-        response = requests.get(
-            self.url + end_point,
+    def _do_request(self, method, url, **kwargs):
+        request_method = getattr(requests, method)
+        response = request_method(
+            url,
             auth=HTTPBasicAuth(self.username, self.password),
-            params=query_params
+            **kwargs
         )
 
         # TODO: Deal with handling error responses from the server
-
         return response
+
+    def put(self, end_point, payload):
+        return self._do_request(
+            'put',
+            self.url + end_point,
+            json=payload
+        )
+
+    def post(self, end_point, payload):
+        return self._do_request(
+            'post',
+            self.url + end_point,
+            json=payload
+        )
+
+    def delete(self, end_point):
+        return self._do_request(
+            'delete',
+            self.url + end_point,
+        )
+
+    def get(self, end_point, query_params=None):
+        return self._do_request(
+            'get',
+            self.url + end_point,
+            params=query_params
+        )
 
 
 connection = None
