@@ -22,6 +22,12 @@ class Constants(object):
         self.TYPE_DATE = 'Date'
         self.TYPE_BOOLEAN = 'Boolean'
 
+        self.REPLY_ACTION_UNSET = 'Unset'
+        self.REPLY_ACTION_WEBMAIL_FORWARD = 'WebMailForward'
+        self.REPLY_ACTION_WEBMAIL = 'WebMail'
+        self.REPLY_ACTION_DELETE = 'Delete'
+
+        self.CAMPAIGN_STATUS_UNSENT = 'Unsent'
 
 
     def __setattr__(self, key, value):
