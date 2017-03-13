@@ -1,6 +1,6 @@
 
-from constants import constants
-from connection import connection
+from dotmailer.constants import constants
+from dotmailer.connection import connection
 
 class AddressBook(object):
 

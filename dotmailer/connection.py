@@ -21,7 +21,7 @@ class DotMailerConnection(object):
         )
 
         # TODO: Deal with handling error responses from the server
-        return response
+        return response.json()
 
     def put(self, end_point, payload):
         return self._do_request(
