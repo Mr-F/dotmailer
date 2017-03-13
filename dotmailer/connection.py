@@ -21,7 +21,15 @@ class DotMailerConnection(object):
         )
 
         # TODO: Deal with handling error responses from the server
-        return response.json()
+
+        # Attempt to return the JSON response from the server
+        try:
+            return response.json()
+        except ValueError as e:
+            # If requests couldn't decode the JSON then just return the
+            # text output from the response.
+            return response.text
+
 
     def put(self, end_point, payload):
         return self._do_request(

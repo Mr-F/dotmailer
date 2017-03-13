@@ -9,8 +9,8 @@ class AddressBook(object):
     name = None
     visibility = constants.VISIBILITY_PRIVATE
 
-    def __init__(self, name, **kwargs):
-        self.name = name
+    def __init__(self, **kwargs):
+        self.name = kwargs['name']
         self.id = kwargs.get('id', None)
         self.visibility = kwargs.get(
             'visibility', constants.VISIBILITY_PRIVATE)
@@ -109,7 +109,7 @@ class AddressBook(object):
         response = connection.get(
             '{}/{}'.format(cls.end_point, id)
         )
-        return cls(response['name'], **response)
+        return cls(**response)
 
     @classmethod
     def get_multiple(cls, select=1000, skip=0):
@@ -137,7 +137,7 @@ class AddressBook(object):
             cls.end_point,
             query_params={'Select': select, 'Skip':skip}
         )
-        return [ cls(entry['name'], **entry) for entry in response]
+        return [ cls(**entry) for entry in response]
 
     @classmethod
     def get_private(cls, select=1000, skip=0):
@@ -153,7 +153,7 @@ class AddressBook(object):
             cls.end_point + '/private',
             query_params={'Select': select, 'Skip':skip}
         )
-        return [ cls(entry['name'], **entry) for entry in response]
+        return [ cls(**entry) for entry in response]
 
     @classmethod
     def get_public(cls, select=1000, skip=0):
@@ -169,7 +169,7 @@ class AddressBook(object):
             cls.end_point + '/public',
             query_params={'Select': select, 'Skip':skip}
         )
-        return [cls(entry['name'], **entry) for entry in response]
+        return [cls(**entry) for entry in response]
 
     @classmethod
     def get_all(cls, type='All'):
