@@ -1,11 +1,11 @@
-from constants import constants
-from connection import connection
-from address_books import AddressBook
+from dotmailer import Base
+from dotmailer.constants import constants
+from dotmailer.connection import connection
+from dotmailer.address_books import AddressBook
 
-class Contact(object):
+class Contact(Base):
 
     end_point = '/v2/contacts'
-    id = None
     email = None
     optin_type = constants.CONTACT_OPTINTYPE_UNKNOWN
     email_type = constants.CONTACT_EMAILTYPE_HTML
@@ -21,6 +21,14 @@ class Contact(object):
                                      constants.CONTACT_EMAILTYPE_HTML)
         self.data_fields = kwargs.get('dataTypes', None)
 
+    def _param_dict(self):
+        return {
+            'Email': self.email,
+            'OptInType': self.optin_type,
+            'EmailType': self.email_type
+            # TODO: Add support for data fields
+        }
+
     def create(self):
         """
         Creates a contact
@@ -29,15 +37,9 @@ class Contact(object):
         """
         response = connection.post(
             self.end_point,
-            {
-                'Email': self.email,
-                'OptInType': self.optin_type,
-                'EmailType': self.email_type,
-                # TODO: Add support for data fields
-            }
+            self._param_dict()
         )
-        for key in response.keys():
-            setattr(self, key, response[key])
+        self.update_values(response)
         return self
 
     def delete(self):
@@ -67,16 +69,10 @@ class Contact(object):
         self.validate_id('Sorry unable to update this contact as no ID value'
                          'has been defined.')
         response = connection.put(
-            '{}/{}'.format(
-                self.end_point, self.id
-            ),
-            {
-                'Email': self.email,
-                'OptInType': self.optin_type,
-                'EmailType': self.email_type,
-                # TODO: Add support for data fields
-            }
+            '{}/{}'.format(self.end_point, self.id),
+            self._param_dict()
         )
+        self.update_values(response)
         return self
 
     def add_to_address_book(self, address_book):
@@ -158,9 +154,7 @@ class Contact(object):
                          'with the contact.')
 
         response = connection.get(
-            '{}/{}/address-books'.format(
-                self.end_point, self.id
-            ),
+            '{}/{}/address-books'.format(self.end_point, self.id),
             query_params={'Select': select, 'Skip': skip}
         )
         return [AddressBook(entry['name'], **entry) for entry in response]
@@ -232,36 +226,29 @@ class Contact(object):
     # TODO: bulk create contacts in address book
 
 
-
-    # TODO: This possibly refactored into a function
-    def validate_id(self, message):
-
-        # TODO: Add some type checking in here to help catch potential errors
-
-        # If this object has no id specified then raise an exception as
-        # you aren't able to issue a delete for an address book which
-        # doesn't exist on DotMailer
-        if self.id is None or self.id < 1:
-            raise Exception(message)
-
-
-class ContactDataField(object):
+class ContactDataField(Base):
 
     end_point = '/v2/data-fields'
-    id = None
     name = None
     type = None
     visibility = constants.VISIBILITY_PRIVATE
     default_value = None
 
-    def __init__(self, name, type, **kwargs):
-        self.name = name
-        self.type = type
+    def __init__(self, **kwargs):
+        self.name = kwargs['name']
+        self.type = kwargs['type']
         self.id = kwargs.get('id', None)
         self.visibility = kwargs.get('visibility',
                                      constants.VISIBILITY_PRIVATE)
         self.default_value = kwargs.get('default_value', None)
 
+    def _params_dict(self):
+        return {
+            'Name': self.name,
+            'Type': self.type,
+            'Visibility': self.visibility,
+            'DefaultValue': self.default_value
+        }
 
     def create(self):
         """
@@ -271,12 +258,7 @@ class ContactDataField(object):
         """
         response = connection.post(
             self.end_point,
-            {
-                'Name': self.name,
-                'Type': self.type,
-                'Visibility': self.visibility,
-                'DefaultValue': self.default_value
-            }
+            self._params_dict()
         )
         for key in response.keys():
             setattr(self, key, response[key])
@@ -288,11 +270,14 @@ class ContactDataField(object):
 
         :return:
         """
+        self.validate_id('Sorry unable to delete custom contact data field.'
+                         'No ID value is defined for it')
+
         response = connection.delete(
-            '{}/{}'.format(
-                self.end_point, self.name
-            )
+            '{}/{}'.format(self.end_point, self.name)
         )
+        self.id = None
+        return self
 
     @classmethod
     def get_all(cls):
@@ -304,5 +289,4 @@ class ContactDataField(object):
         response = connection.get(
             cls.end_point
         )
-        return [ContactDataField(entry['name'], entry['type'], **entry)
-                for entry in response]
+        return [ContactDataField(**entry) for entry in response]

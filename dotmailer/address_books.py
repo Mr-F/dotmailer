@@ -2,6 +2,7 @@ from dotmailer import Base
 from dotmailer.constants import constants
 from dotmailer.connection import connection
 
+
 class AddressBook(Base):
 
     end_point = '/v2/address-books'
