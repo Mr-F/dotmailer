@@ -38,7 +38,7 @@ class Base(object):
             raise Exception(message)
 
     def strftime(self, date):
-        # TODO: Add some validation of the type "date" is
+        # TODO: Add some validation of the type "date" i
         return date.strftime(self.date_format)
 
     def strptime(self, date_string):

@@ -1,11 +1,10 @@
-
+from dotmailer import Base
 from dotmailer.constants import constants
 from dotmailer.connection import connection
 
-class AddressBook(object):
+class AddressBook(Base):
 
     end_point = '/v2/address-books'
-    id = None
     name = None
     visibility = constants.VISIBILITY_PRIVATE
 
@@ -28,34 +27,12 @@ class AddressBook(object):
         response = connection.post(
             self.end_point,
             {
-                'name': self.name,
-                'visibility': self.visibility
+                'Name': self.name,
+                'Visibility': self.visibility
             }
         )
 
-        for key in response.keys():
-            setattr(self, key, response[key])
-        return self
-
-    def delete(self):
-        """
-        Deletes an address book
-
-        :return:
-        """
-
-        # Validate that we should be able to perform a delete on this
-        # AddressBook object based on a valid ID value being defined
-        self.validate_id('Sorry unable to delete address book as no ID value'
-                         'is defined for it')
-
-        # Attempt to issue the delete request to DotMailer to remove the
-        # address book
-        response = connection.delete(self.end_point + str(self.id))
-
-        # Clear the current ID value so we can't accidently call this
-        # delete call multiple times
-        self.id = None
+        self.update_values(response)
         return self
 
     def update(self):
@@ -79,14 +56,34 @@ class AddressBook(object):
             raise Exception()
 
         response = connection.put(
-            '{}/{}'.format(
-                self.end_point, self.id
-            ),
+            '{}/{}'.format(self.end_point, self.id),
             {
-                'name': self.name,
-                'visibility': self.visibility
+                'Name': self.name,
+                'Visibility': self.visibility
             }
         )
+        self.update_values(response)
+        return self
+
+    def delete(self):
+        """
+        Deletes an address book
+
+        :return:
+        """
+
+        # Validate that we should be able to perform a delete on this
+        # AddressBook object based on a valid ID value being defined
+        self.validate_id('Sorry unable to delete address book as no ID value'
+                         'is defined for it')
+
+        # Attempt to issue the delete request to DotMailer to remove the
+        # address book
+        response = connection.delete(self.end_point + str(self.id))
+
+        # Clear the current ID value so we can't accidently call this
+        # delete call multiple times
+        self.id = None
         return self
 
     @classmethod
@@ -302,13 +299,3 @@ class AddressBook(object):
         """
 
         return len(value) <= 128
-
-    def validate_id(self, message):
-
-        # TODO: Add some type checking in here to help catch potential errors
-
-        # If this object has no id specified then raise an exception as
-        # you aren't able to issue a delete for an address book which
-        # doesn't exist on DotMailer
-        if self.id is None or self.id < 1:
-            raise Exception(message)
