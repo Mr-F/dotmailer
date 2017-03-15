@@ -21,7 +21,7 @@ class Contact(Base):
                                      constants.CONTACT_EMAILTYPE_HTML)
         self.data_fields = kwargs.get('dataTypes', None)
 
-    def _param_dict(self):
+    def param_dict(self):
         return {
             'Email': self.email,
             'OptInType': self.optin_type,
@@ -37,7 +37,7 @@ class Contact(Base):
         """
         response = connection.post(
             self.end_point,
-            self._param_dict()
+            self.param_dict()
         )
         self.update_values(response)
         return self
@@ -70,7 +70,7 @@ class Contact(Base):
                          'has been defined.')
         response = connection.put(
             '{}/{}'.format(self.end_point, self.id),
-            self._param_dict()
+            self.param_dict()
         )
         self.update_values(response)
         return self
@@ -242,7 +242,7 @@ class ContactDataField(Base):
                                      constants.VISIBILITY_PRIVATE)
         self.default_value = kwargs.get('default_value', None)
 
-    def _params_dict(self):
+    def params_dict(self):
         return {
             'Name': self.name,
             'Type': self.type,
@@ -258,7 +258,7 @@ class ContactDataField(Base):
         """
         response = connection.post(
             self.end_point,
-            self._params_dict()
+            self.params_dict()
         )
         for key in response.keys():
             setattr(self, key, response[key])

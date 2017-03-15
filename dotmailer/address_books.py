@@ -15,6 +15,12 @@ class AddressBook(Base):
         self.visibility = kwargs.get(
             'visibility', constants.VISIBILITY_PRIVATE)
 
+    def param_dict(self):
+        return {
+            'Name': self.name,
+            'Visibility': self.visibility
+        }
+
     def create(self):
         """
         Creates an address book
@@ -27,10 +33,7 @@ class AddressBook(Base):
 
         response = connection.post(
             self.end_point,
-            {
-                'Name': self.name,
-                'Visibility': self.visibility
-            }
+            self.param_dict()
         )
 
         self.update_values(response)
@@ -58,10 +61,7 @@ class AddressBook(Base):
 
         response = connection.put(
             '{}/{}'.format(self.end_point, self.id),
-            {
-                'Name': self.name,
-                'Visibility': self.visibility
-            }
+            self.param_dict()
         )
         self.update_values(response)
         return self
@@ -225,12 +225,7 @@ class AddressBook(Base):
 
         connection.post(
             self.end_point + '/' + str(self.id),
-            {
-                'Email': contact.email,
-                'OptInType': contact.optin_type,
-                'EmailType': contact.email_type,
-                # TODO: Add support for data fields
-            }
+            contact.param_dict()
         )
 
     def delete_contact(self, contact):

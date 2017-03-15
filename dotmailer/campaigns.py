@@ -42,7 +42,7 @@ class Campaign(Base):
                                        constants.REPLY_ACTION_UNSET)
         self.reply_address = kwargs.get('reply_address', None)
 
-    def _param_dict(self):
+    def param_dict(self):
         return {
             'Name': self.name,
             'Subject': self.subject,
@@ -66,7 +66,7 @@ class Campaign(Base):
         # TODO: Confirm that if I send "null" values that campaign will still be created correctly
         response = connection.post(
             self.end_point,
-            self._param_dict()
+            self.param_dict()
         )
         self.update_values(response)
         return self
@@ -83,7 +83,7 @@ class Campaign(Base):
             '{}/{}'.format(
                 self.end_point, self.id
             ),
-            self._param_dict()
+            self.param_dict()
         )
         self.update_values(response)
         return self
