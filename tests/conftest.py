@@ -4,6 +4,7 @@ import os
 
 from dotmailer.account import Account
 
+
 @pytest.fixture(scope='session')
 def connection(request):
     config = ConfigParser.ConfigParser()
