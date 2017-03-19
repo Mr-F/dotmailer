@@ -1,6 +1,7 @@
 import simplejson as json
 import requests
 from requests.auth import HTTPBasicAuth
+from dotmailer import exceptions
 
 class DotMailerConnection(object):
 
@@ -20,16 +21,34 @@ class DotMailerConnection(object):
             **kwargs
         )
 
-        # TODO: Deal with handling error responses from the server
-
         # Attempt to return the JSON response from the server
         try:
-            return response.json()
+            response_data = response.json()
         except ValueError as e:
             # If requests couldn't decode the JSON then just return the
             # text output from the response.
-            return response.text
+            response_data = response.text
 
+        # If the response code was not 200 then an exception has been raised
+        # and we need to pass that on.  This isn't pretty, but it should do
+        # for a fast pass
+        if response.status_code != 200:
+
+            exception_class_name = None
+            if response.status_code == 401:
+                exception_class_name = 'ErrorAccountInvalid'
+            else:
+                print response_data
+                print response_data['message']
+
+                exception_class_name = response_data['message']
+                exception_class_name = exception_class_name[
+                    exception_class_name.find(':')+1:
+                ].strip().title().replace('_','')
+
+            raise getattr(exceptions, exception_class_name)()
+
+        return response_data
 
     def put(self, end_point, payload):
         return self._do_request(

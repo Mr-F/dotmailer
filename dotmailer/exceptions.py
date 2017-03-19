@@ -1,3 +1,5 @@
+# -*- coding: utf8 -*-
+
 class ErrorAccountInvalid(Exception):
     """
     ERROR_ACCOUNT_INVALID
@@ -8,7 +10,7 @@ class ErrorAccountInvalid(Exception):
     pass
 
 
-class ErrorAddressBookDuplicate(Exception):
+class ErrorAddressbookDuplicate(Exception):
     """
     ERROR_ADDRESSBOOK_DUPLICATE
     There is already an address book with that name in the account.
@@ -19,7 +21,7 @@ class ErrorAddressBookDuplicate(Exception):
     pass
 
 
-class ErrorAddressBookInUse(Exception):
+class ErrorAddressbookInUse(Exception):
     """
     ERROR_ADDRESSBOOK_IN_USE
     The address book you are attempting to use in your request is in use
@@ -28,7 +30,7 @@ class ErrorAddressBookInUse(Exception):
     pass
 
 
-class ErrorAddressBookInvalid(Exception):
+class ErrorAddressbookInvalid(Exception):
     """
     ERROR_ADDRESSBOOK_INVALID
     This address book is not valid. This means that there is something
@@ -40,7 +42,7 @@ class ErrorAddressBookInvalid(Exception):
     pass
 
 
-class ErrorAddressBookLimitExceeded(Exception):
+class ErrorAddressbookLimitExceeded(Exception):
     """
     ERROR_ADDRESSBOOK_LIMITEXCEEDED
     Your account will have a limited number of address books, which
@@ -51,7 +53,7 @@ class ErrorAddressBookLimitExceeded(Exception):
     pass
 
 
-class ErrorAddressBookNotFound(Exception):
+class ErrorAddressbookNotFound(Exception):
     """
     ERROR_ADDRESSBOOK_NOT_FOUND
     The address book you have specified with the addressBookId argument
@@ -61,7 +63,7 @@ class ErrorAddressBookNotFound(Exception):
     pass
 
 
-class ErrorAddressBookNotWritable(Exception):
+class ErrorAddressbookNotWritable(Exception):
     """
     ERROR_ADDRESSBOOK_NOTWRITABLE
     The address book you have specified with the addressBookId argument
