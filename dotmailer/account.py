@@ -6,7 +6,8 @@ class Account(object):
     @staticmethod
     def get_account_information():
         """
-        Gets a summary of information about the current status of the account
+        Gets a summary of information about the current status of the
+        account
 
         :return:
         """
