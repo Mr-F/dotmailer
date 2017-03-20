@@ -9,7 +9,7 @@ with open(path.join(here, 'README.md')) as f:
 
 setup(
     name='dotmailer',
-    version='0.0',
+    version='0.1',
     description='DotMailer API wrapper',
     long_description=long_description,
 
