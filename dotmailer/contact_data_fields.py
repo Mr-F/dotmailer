@@ -18,6 +18,12 @@ class ContactDataField(Base):
         self.visibility = kwargs.get('visibility', constants.VISIBILITY_PRIVATE)
         self.default_value = kwargs.get('default_value', None)
 
+    def __repr__(self):
+        return '<ContactDataField name={}, type={}, visibility={}, ' \
+               'default_value={}>'.format(
+            self.name, self.type, self.visibility, self.default_value
+        )
+
     def param_dict(self):
         return {
             'Name': self.name,
