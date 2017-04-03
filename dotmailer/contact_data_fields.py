@@ -1,7 +1,9 @@
+import re
 from dotmailer import Base
 from dotmailer.constants import constants
 from dotmailer.connection import connection
 
+name_re = re.compile('[^a-zA-Z0-9-\-]')
 
 class ContactDataField(Base):
 
@@ -117,10 +119,13 @@ class ContactDataField(Base):
         :return: 
         """
         if len(value) > 20:
-            raise Exception('Sorry, custom data fields can only have a maximum'
+            raise Exception('Sorry, contact data fields can only have a maximum'
                             'of 20 characters in them')
 
-        # TODO: Implement check for the correct
-        if False:
-            pass
+
+        if bool(name_re.search(value)):
+            raise Exception('Sorry, the contact data field name is not valid.'
+                            'Names must only contains alphanumeric characters'
+                            'and either hyphens and underscores.')
+        return True
 
