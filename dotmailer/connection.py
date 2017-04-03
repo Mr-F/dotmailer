@@ -22,14 +22,15 @@ class DotMailerConnection(object):
     username = None
     password = None
 
-    def __init__(self, username, password):
+    def __init__(self):
         """
 
         :param username: The API account username
         :param password: The API account password
         """
-        self.username = username
-        self.password = password
+        # self.username = username
+        # self.password = password
+        pass
 
     def _do_request(self, method, url, **kwargs):
         """
@@ -105,4 +106,4 @@ class DotMailerConnection(object):
         )
 
 
-connection = None
+connection = DotMailerConnection()

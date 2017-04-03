@@ -11,9 +11,9 @@ class Contact(Base):
     email_type = constants.CONTACT_EMAILTYPE_HTML
     data_fields = None
 
-    def __init__(self, email, **kwargs):
+    def __init__(self, **kwargs):
 
-        self.email = email
+        self.email = kwargs['email']
         self.id = kwargs.get('id', None)
         self.optin_type = kwargs.get('optInType',
                                      constants.CONTACT_OPTINTYPE_UNKNOWN)
@@ -22,11 +22,15 @@ class Contact(Base):
         self.data_fields = kwargs.get('dataTypes', None)
 
     def param_dict(self):
+        contact_data_fields = [
+            {'key': key, 'value':value}
+            for key, value in self.data_fields.items()
+        ]
         return {
             'Email': self.email,
             'OptInType': self.optin_type,
-            'EmailType': self.email_type
-            # TODO: Add support for data fields
+            'EmailType': self.email_type,
+            'DataFields': contact_data_fields
         }
 
     def create(self):
@@ -125,7 +129,7 @@ class Contact(Base):
         response = connection.get(
             cls.end_point + '/' + email
         )
-        return cls(response['email'], **response)
+        return cls(**response)
 
     @classmethod
     def get_by_id(cls, id):
@@ -139,7 +143,7 @@ class Contact(Base):
         response = connection.get(
             cls.end_point + '/' + id
         )
-        return cls(response['email'], **response)
+        return cls(**response)
 
     def get_address_books(self, select=1000, skip=0):
         """
@@ -157,7 +161,7 @@ class Contact(Base):
             '{}/{}/address-books'.format(self.end_point, self.id),
             query_params={'Select': select, 'Skip': skip}
         )
-        return [AddressBook(entry['name'], **entry) for entry in response]
+        return [AddressBook(**entry) for entry in response]
 
     def get_all_address_books(self):
         """
@@ -192,9 +196,9 @@ class Contact(Base):
         # TODO: Add some validation in for the parameter data types
         response = connection.get(
             cls.end_point,
-            query_param={'Select': select, 'Skip': skip}
+            query_params={'Select': select, 'Skip': skip}
         )
-        return [cls(entry['email'], **entry) for entry in response]
+        return [cls(**entry) for entry in response]
 
     # TODO: Create a wrapper function for 'get_contacts' to perform a series of calls to get all contacts
 
@@ -217,76 +221,10 @@ class Contact(Base):
                 'WithFullData': with_full_data, 'Select': select, 'Skip': skip
             }
         )
-        return [cls(entry['email'], **entry) for entry in response]
+        return [cls(**entry) for entry in response]
 
     # TODO: Create a wrapper function for 'get_contacts_since' to perform a series of calls to get all contacts
 
     # TODO: bulk create contacts
 
     # TODO: bulk create contacts in address book
-
-
-class ContactDataField(Base):
-
-    end_point = '/v2/data-fields'
-    name = None
-    type = None
-    visibility = constants.VISIBILITY_PRIVATE
-    default_value = None
-
-    def __init__(self, **kwargs):
-        self.name = kwargs['name']
-        self.type = kwargs['type']
-        self.id = kwargs.get('id', None)
-        self.visibility = kwargs.get('visibility',
-                                     constants.VISIBILITY_PRIVATE)
-        self.default_value = kwargs.get('default_value', None)
-
-    def params_dict(self):
-        return {
-            'Name': self.name,
-            'Type': self.type,
-            'Visibility': self.visibility,
-            'DefaultValue': self.default_value
-        }
-
-    def create(self):
-        """
-        Creates a contact data field within the account
-
-        :return:
-        """
-        response = connection.post(
-            self.end_point,
-            self.params_dict()
-        )
-        for key in response.keys():
-            setattr(self, key, response[key])
-        return self
-
-    def delete(self):
-        """
-        Deletes a contact data field within the account
-
-        :return:
-        """
-        self.validate_id('Sorry unable to delete custom contact data field.'
-                         'No ID value is defined for it')
-
-        response = connection.delete(
-            '{}/{}'.format(self.end_point, self.name)
-        )
-        self.id = None
-        return self
-
-    @classmethod
-    def get_all(cls):
-        """
-        Lists all contact data fields within the account
-
-        :return:
-        """
-        response = connection.get(
-            cls.end_point
-        )
-        return [ContactDataField(**entry) for entry in response]

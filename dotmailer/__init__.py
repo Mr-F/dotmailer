@@ -1,4 +1,5 @@
 import datetime
+import dotmailer.connection as dmconnection
 
 class Base(object):
 
@@ -16,6 +17,9 @@ class Base(object):
                 setattr(self, key, value)
         elif isinstance(data, tuple):
             setattr(data[0], data[1])
+
+    def param_dict(self):
+        raise Exception()
 
     def validate_id(self, message='No ID value specified'):
         """

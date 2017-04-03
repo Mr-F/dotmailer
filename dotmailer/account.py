@@ -1,5 +1,5 @@
-import dotmailer.connection as dmconnection
 
+from dotmailer.connection import connection
 
 class Account(object):
 
@@ -11,7 +11,7 @@ class Account(object):
 
         :return:
         """
-        return dmconnection.connection.get(
+        return connection.get(
             '/v2/account-info'
         )
 
@@ -22,7 +22,7 @@ class Account(object):
 
         :return:
         """
-        return dmconnection.connection.get(
+        return connection.get(
             '/v2/custom-from-addresses'
         )
 
@@ -46,9 +46,7 @@ class Account(object):
         return all_addresses
 
     @staticmethod
-    def create_connection(username='demo@apiconnector.com', password='demo'):
-        dmconnection.connection = dmconnection.DotMailerConnection(
-            username,
-            password
-        )
-        return dmconnection.connection
+    def setup_connection(username='demo@apiconnector.com', password='demo'):
+        connection.username = username
+        connection.password = password
+        return connection
