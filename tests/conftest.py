@@ -9,7 +9,7 @@ from dotmailer.account import Account
 def connection(request):
     config = ConfigParser.ConfigParser()
     config.read(os.path.abspath(request.config.inicfg.config.path))
-    Account.create_connection(
+    Account.setup_connection(
         username=config.get('pytest', 'username'),
         password=config.get('pytest', 'password')
     )
