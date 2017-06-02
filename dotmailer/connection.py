@@ -1,5 +1,7 @@
 import simplejson as json
 import requests
+import re
+
 from requests.auth import HTTPBasicAuth
 from dotmailer import exceptions
 
@@ -21,6 +23,21 @@ class DotMailerConnection(object):
     url = 'https://r1-api.dotmailer.com'
     username = None
     password = None
+
+    _first_cap_re = re.compile('(.)([A-Z][a-z]+)')
+    _all_cap_re = re.compile('([a-z0-9])([A-Z])')
+
+
+    # TODO: This might be better off in some support file
+    def convert_camel_case_key(self, key):
+        stage1 = self._first_cap_re.sub(r'\1_\2', key)
+        return self._all_cap_re.sub(r'\1_\2', stage1).lower()
+
+    def convert_camel_case_dict(self, data_dict):
+        return {
+            self.convert_camel_case_key(key): val for key, val in
+        data_dict.items()
+        }
 
     def __init__(self):
         """
@@ -59,7 +76,10 @@ class DotMailerConnection(object):
         # response and return to the caller
         if response.ok:
             try:
-                return response.json()
+                json = response.json()
+                # Next convert the CamelCase variables back to underscore
+                # version to keep inline with PEP8 python, and return
+                return self.convert_camel_case_dict(json)
             except ValueError as e:
                 # If requests couldn't decode the JSON then just return
                 # the text output from the response.
