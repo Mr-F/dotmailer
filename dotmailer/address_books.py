@@ -4,6 +4,16 @@ from dotmailer.connection import connection
 
 
 class AddressBook(Base):
+    """
+    name: The name of the address book you're creating, which
+        needs to be included within the request body. It can't be an
+        existing address book's name, 'Test' or 'All contacts'. There is
+        a limit of 128 characters.
+        
+    visibility: All address books are created as 'Private' by
+        default but you can set it as 'Public' upon creation should you
+        wish to. This needs to be included within the request body.
+    """
 
     end_point = '/v2/address-books'
     name = None
@@ -43,13 +53,6 @@ class AddressBook(Base):
         """
         Updates an address book
 
-        :param name: The name of the address book you're creating, which
-        needs to be included within the request body. It can't be an
-        existing address book's name, 'Test' or 'All contacts'. There is
-        a limit of 128 characters.
-        :param visibility: All address books are created as 'Private' by
-        default but you can set it as 'Public' upon creation should you
-        wish to. This needs to be included within the request body.
         :return:
         """
 

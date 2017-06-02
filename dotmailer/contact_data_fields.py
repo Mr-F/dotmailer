@@ -7,6 +7,8 @@ name_re = re.compile('[^a-zA-Z0-9_\-]')
 
 class ContactDataField(Base):
 
+    invalid_name_msg = 'Invalid contact data field name.  Please refer to ' \
+                       'DotMailer\'s documentation about allowable names'
     end_point = '/v2/data-fields'
     name = None
     type = constants.TYPE_STRING
@@ -54,7 +56,7 @@ class ContactDataField(Base):
         :return: 
         """
         if not self.valid_name(self.name):
-            raise Exception()
+            raise Exception(self.invalid_name_msg)
 
         response = connection.post(
             self.end_point,
@@ -78,7 +80,7 @@ class ContactDataField(Base):
         :return: 
         """
         if not self.valid_name(self.name):
-            raise Exception()
+            raise Exception(self.invalid_name_msg)
 
         # TODO: Possibly could put in some validation to make sure tha called isn't trying to delete one of the reserved contact data fields
         response = connection.delete(

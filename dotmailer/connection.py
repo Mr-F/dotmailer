@@ -57,7 +57,7 @@ class DotMailerConnection(object):
 
         # The response status code was a success then process the
         # response and return to the caller
-        if response.status_code == 200:
+        if response.ok:
             try:
                 return response.json()
             except ValueError as e:
@@ -67,13 +67,13 @@ class DotMailerConnection(object):
 
         # Else the response code was not 200 then an exception has been
         # raised and we need to pass that on.  This isn't pretty, but
-        # it should do for a fast pass
+        # it should do for a first pass
         if response.status_code == 401:
             exception_class_name = 'ErrorAccountInvalid'
         else:
             message = response.json()['message']
             exception_class_name = message[
-                message.find(':')+1:
+                message.find('.')+1:
             ].strip().title().replace('_','')
 
         raise getattr(exceptions, exception_class_name)()

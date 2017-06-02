@@ -1,0 +1,2 @@
+from dotmailer.contact_data_fields import ContactDataField
+
