@@ -7,22 +7,16 @@ class Base(object):
     id = None
     date_format = '%Y-%m-%dT%H:%M:%S'
 
-    _first_cap_re = re.compile('(.)([A-Z][a-z]+)')
-    _all_cap_re = re.compile('([a-z0-9])([A-Z])')
-
     def update_values(self, data):
         """
 
         :param data:
         :return:
         """
-        def convert_key(key):
-            stage1 = self._first_cap_re.sub(r'\1_\2', key)
-            return self._all_cap_re.sub(r'\1_\2', stage1).lower()
 
         if isinstance(data, dict):
             for key, value in data.items():
-                setattr(self, convert_key(key), value)
+                setattr(self, key, value)
 
         elif isinstance(data, tuple):
             setattr(data[0], data[1])
