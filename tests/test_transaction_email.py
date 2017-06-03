@@ -2,20 +2,21 @@ import pytest
 import datetime
 from dotmailer.transactional_email import TransactionEmail
 
+
 def test_valid_send(connection):
 
     test_data = dict(
         to_address='mr-f@mr-f.org',
         subject='Hello, world!',
         from_address='demo@apiconnector.com',
-        html_content='<div>Hello, world!<a href="http://$UNSUB$"> Unsubscribe from this newsletter</a></div>',
+        html_content='<div>Hello, world!<a href="http://$UNSUB$"> Unsubscribe '
+                     'from this newsletter</a></div>',
         plain_text_content='Hello, world! $UNSUB$'
     )
 
     transactional_email = TransactionEmail(**test_data)
-    response = transactional_email.send()
+    transactional_email.send()
     # The only thing to test is that no exception is raised
-
 
 
 @pytest.mark.parametrize('aggregate_by', ['AllTime', 'Month', 'Week', 'Day'])
@@ -26,6 +27,7 @@ def test_get_stats(connection, aggregate_by):
     just that the keys we expected to be there are.
     
     :param connection: 
+    :param aggregate_by:
     :return: 
     """
     expected_keys = [
@@ -46,4 +48,3 @@ def test_get_stats(connection, aggregate_by):
     for group in response:
         for key in expected_keys:
             assert key in group
-

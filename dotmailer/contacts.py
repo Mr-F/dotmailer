@@ -4,10 +4,40 @@ from dotmailer.connection import connection
 from dotmailer.address_books import AddressBook
 
 class Contact(Base):
+    """
+    This class represents a DotMailer contact.  To be able to create a 
+    contact, you must specify the email of the contact.
+    
+    Required Fields
+    
+    email: A string containing the email address of the contact that you
+        wish to add.
+    
+    Optional Fields
+    
+    opt_in_type: A string which represents the type of optin that the
+        contact performed.  You can either specify these values by hand
+        or use the pre-defined constant values
+            
+            Unknown = constants.CONTACT_OPTINTYPE_UNKNOWN
+            Single  = constants.CONTACT_OPTINTYPE_SINGLE
+            Double  = constants.CONTACT_OPTINTYPE_DOUBLE
+            VerifiedDouble = constants.CONTACT_OPTINTYPE_VERIFIEDDOUBLE
+    
+    email_type: A string representing the type of email that the contac
+        would prefer to receive.  This can be either plain text or HTML.
+        Alternatively use the constant values
+        
+            HTML  = constatns.CONTACT_EMAILTYPE_HTML
+            plain text = constants.CONTACT_EMAILTYPE_PLAIN
+    
+    data_fields: A list of typles which defined any data fields and
+        value that should be associated with the contact.
+    """
 
     end_point = '/v2/contacts'
     email = None
-    optin_type = constants.CONTACT_OPTINTYPE_UNKNOWN
+    opt_in_type = constants.CONTACT_OPTINTYPE_UNKNOWN
     email_type = constants.CONTACT_EMAILTYPE_HTML
     data_fields = None
 
@@ -16,22 +46,24 @@ class Contact(Base):
 
         # Setup the other optional fields to the default value if they have not
         # been specified.
-        if 'optInType' not in kwargs:
-            kwargs['optInType'] = constants.CONTACT_OPTINTYPE_UNKNOWN
-        if 'emailType' not in kwargs:
-            kwargs['emailType'] = constants.CONTACT_EMAILTYPE_HTML
-        if 'dataTypes' not in kwargs:
-            kwargs['dataTypes'] = None
+        if 'opt_in_type' not in kwargs:
+            kwargs['opt_in_type'] = constants.CONTACT_OPTINTYPE_UNKNOWN
+        if 'email_type' not in kwargs:
+            kwargs['email_type'] = constants.CONTACT_EMAILTYPE_HTML
+        if 'data_fields' not in kwargs:
+            kwargs['data_fields'] = None
         super(Contact, self).__init__(**kwargs)
 
     def param_dict(self):
-        contact_data_fields = [
-            {'key': key, 'value':value}
-            for key, value in self.data_fields.items()
-        ]
+        contact_data_fields = []
+        if self.data_fields is not None:
+            contact_data_fields = [
+                {'key': key, 'value':value}
+                for key, value in self.data_fields.items()
+            ]
         return {
             'Email': self.email,
-            'OptInType': self.optin_type,
+            'OptInType': self.opt_in_type,
             'EmailType': self.email_type,
             'DataFields': contact_data_fields
         }
