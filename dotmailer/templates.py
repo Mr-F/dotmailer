@@ -38,11 +38,10 @@ class Template(Base):
     plain_text_content = None
 
     def __init__(self, **kwargs):
-        self.name = kwargs['name']
-        self.subject = kwargs['subject']
-        self.from_name = kwargs['from_name']
-        self.html_content = kwargs['html_content']
-        self.plain_text_content = kwargs['plain_text_content']
+        self.required_fields = [
+            'name', 'subject', 'from_name', 'html_content', 'plain_text_content'
+        ]
+        super(Template, self).__init__(**kwargs)
 
     def param_dict(self):
         return {
@@ -64,7 +63,7 @@ class Template(Base):
             self.end_point,
             self.param_dict()
         )
-        self.update_values(response)
+        self._update_values(response)
         return self
 
     def update(self):
@@ -73,7 +72,7 @@ class Template(Base):
         
         :return: 
         """
-        self.validate_id('Sorry unable to update this template as no ID value'
+        self.validate_id('Sorry unable to update this template as no ID value '
                          'has been defined.')
 
         # TODO: Confirm if DotMailer have any specific validation for template names that we need to implement here
@@ -82,7 +81,7 @@ class Template(Base):
             '{}/{}'.format(self.end_point, self.id),
             self.param_dict()
         )
-        self.update_values(response)
+        self._update_values(response)
         return self
 
     @classmethod
@@ -115,9 +114,16 @@ class Template(Base):
         skip = 0
 
         response = connection.get(
-            cls.end_point + '/templates',
+            cls.end_point,
             query_params={'Select': select, 'Skip': skip}
         )
+        templates = []
+        for entry in response:
+            t = cls(**entry)
+            print entry['id']
+            print "ID", t.id
+            print '*' * 100
+            print '*' * 100
         templates = [cls(**entry) for entry in response]
         num_of_templates = len(templates)
 
@@ -132,6 +138,7 @@ class Template(Base):
                 cls.end_point + '/templates',
                 query_params={'Select': select, 'Skip': skip}
             )
+
             templates = [cls(**entry) for entry in response]
             num_of_templates = len(templates)
 

@@ -12,14 +12,17 @@ class Contact(Base):
     data_fields = None
 
     def __init__(self, **kwargs):
+        self.required_fields = ['email']
 
-        self.email = kwargs['email']
-        self.id = kwargs.get('id', None)
-        self.optin_type = kwargs.get('optInType',
-                                     constants.CONTACT_OPTINTYPE_UNKNOWN)
-        self.email_type = kwargs.get('emailType',
-                                     constants.CONTACT_EMAILTYPE_HTML)
-        self.data_fields = kwargs.get('dataTypes', None)
+        # Setup the other optional fields to the default value if they have not
+        # been specified.
+        if 'optInType' not in kwargs:
+            kwargs['optInType'] = constants.CONTACT_OPTINTYPE_UNKNOWN
+        if 'emailType' not in kwargs:
+            kwargs['emailType'] = constants.CONTACT_EMAILTYPE_HTML
+        if 'dataTypes' not in kwargs:
+            kwargs['dataTypes'] = None
+        super(Contact, self).__init__(**kwargs)
 
     def param_dict(self):
         contact_data_fields = [
@@ -43,7 +46,7 @@ class Contact(Base):
             self.end_point,
             self.param_dict()
         )
-        self.update_values(response)
+        self._update_values(response)
         return self
 
     def delete(self):
@@ -76,7 +79,7 @@ class Contact(Base):
             '{}/{}'.format(self.end_point, self.id),
             self.param_dict()
         )
-        self.update_values(response)
+        self._update_values(response)
         return self
 
     def add_to_address_book(self, address_book):

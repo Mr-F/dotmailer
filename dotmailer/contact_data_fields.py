@@ -16,11 +16,18 @@ class ContactDataField(Base):
     default_value = None
 
     def __init__(self, **kwargs):
-        self.name = kwargs['name']
-        self.id = kwargs.get('id', None)
-        self.type = kwargs.get('type', constants.TYPE_STRING)
-        self.visibility = kwargs.get('visibility', constants.VISIBILITY_PRIVATE)
-        self.default_value = kwargs.get('default_value', None)
+        self.required_fields = ['name']
+
+        # Setup the other optional fields to the default value if they have not
+        # been specified.
+        if 'type' not in kwargs:
+            kwargs['type'] =  constants.TYPE_STRING
+        if 'visibility' not in kwargs:
+            kwargs['visibility'] = constants.VISIBILITY_PRIVATE
+        if 'default_value' not in kwargs:
+            kwargs['default_value'] = None
+
+        super(ContactDataField, self).__init__(**kwargs)
 
     def __repr__(self):
         return '<ContactDataField name={}, type={}, visibility={}, ' \
@@ -62,7 +69,7 @@ class ContactDataField(Base):
             self.end_point,
             self.param_dict()
         )
-        self.update_values(response)
+        self._update_values(response)
         return self
 
     def delete(self):

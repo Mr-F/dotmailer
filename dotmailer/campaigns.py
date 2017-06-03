@@ -32,15 +32,18 @@ class Campaign(Base):
     sends = {}
 
     def __init__(self, **kwargs):
-        self.name = kwargs['name']
-        self.subject = kwargs['subject']
-        self.from_name = kwargs['from_name']
-        self.from_address = kwargs['from_address']
-        self.html_content = kwargs['html_content']
-        self.plain_text_content = kwargs.get('plain_text_content', '')
-        self.reply_action = kwargs.get('reply_action',
-                                       constants.REPLY_ACTION_UNSET)
-        self.reply_address = kwargs.get('reply_address', None)
+        self.required_fields = [
+            'name', 'subject', 'from_name', 'from_address', 'html_content',
+            'plain_text_content'
+        ]
+
+        # Setup the other optional fields to the default value if they have not
+        # been specified.
+        if 'reply_action' not in kwargs:
+            kwargs['reply_action'] = constants.REPLY_ACTION_UNSET
+        if 'reply_address' not in kwargs:
+            kwargs['reply_address'] = None
+        super(Campaign, self).__init__(**kwargs)
 
     def param_dict(self):
         return {
@@ -68,7 +71,7 @@ class Campaign(Base):
             self.end_point,
             self.param_dict()
         )
-        self.update_values(response)
+        self._update_values(response)
         return self
 
     def update(self):
@@ -85,7 +88,7 @@ class Campaign(Base):
             ),
             self.param_dict()
         )
-        self.update_values(response)
+        self._update_values(response)
         return self
 
     @classmethod

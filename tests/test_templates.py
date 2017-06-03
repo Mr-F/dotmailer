@@ -67,7 +67,7 @@ def test_update_valid_template(connection):
         html_content='<div>Hello, world!<a href=\"http://$UNSUB$\" style=\"color: black;\"> Unsubscribe from this newsletter</a></div>',
         plain_text_content='Hello, world! $UNSUB$'
     )
-    template.create()
+    template = template.create()
     assert isinstance(template, Template), 'Template type returned'
     assert template.id is not None, 'Template has an ID value'
     template_id = template.id
@@ -86,3 +86,7 @@ def test_get_all(connection):
     :return: 
     """
     templates = Template.get_all()
+    for template in templates:
+        print template
+        assert template.id is not None
+

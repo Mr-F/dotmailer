@@ -20,10 +20,8 @@ class AddressBook(Base):
     visibility = constants.VISIBILITY_PRIVATE
 
     def __init__(self, **kwargs):
-        self.name = kwargs['name']
-        self.id = kwargs.get('id', None)
-        self.visibility = kwargs.get(
-            'visibility', constants.VISIBILITY_PRIVATE)
+        self.required_fields = ['name']
+        super(AddressBook, self).__init__(**kwargs)
 
     def param_dict(self):
         return {
@@ -46,7 +44,7 @@ class AddressBook(Base):
             self.param_dict()
         )
 
-        self.update_values(response)
+        self._update_values(response)
         return self
 
     def update(self):
@@ -66,7 +64,7 @@ class AddressBook(Base):
             '{}/{}'.format(self.end_point, self.id),
             self.param_dict()
         )
-        self.update_values(response)
+        self._update_values(response)
         return self
 
     def delete(self):

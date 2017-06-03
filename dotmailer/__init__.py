@@ -6,8 +6,26 @@ class Base(object):
 
     id = None
     date_format = '%Y-%m-%dT%H:%M:%S'
+    required_fields = []
 
-    def update_values(self, data):
+    def __init__(self, **kwargs):
+        """
+        
+        :param kwargs: 
+        """
+        # Always set a default value for the ID value if it hasn't been
+        # specified
+        if 'id' not in kwargs:
+            kwargs['id'] = None
+
+        for field in self.required_fields:
+            if field not in kwargs:
+                raise KeyError(
+                    'You must specify {} when creating a template'.format(
+                        field))
+        self._update_values(kwargs)
+
+    def _update_values(self, data):
         """
 
         :param data:
