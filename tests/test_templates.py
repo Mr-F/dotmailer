@@ -15,7 +15,7 @@ def test_create_valid_template(connection):
         name='Test',
         subject='test',
         from_name='demo@apiconnector.com',
-        html_content='<div>Hello, world!<a href=\"http://$UNSUB$\" style=\"color: black;\"> Unsubscribe from this newsletter</a></div>',
+        html_content='<div>Hello, world!<a href="http://$UNSUB$"> Unsubscribe from this newsletter</a></div>',
         plain_text_content='Hello, world! $UNSUB$'
     )
     template = test_template.create()
@@ -40,7 +40,7 @@ def test_create_missing_parameter(connection, null_parameter):
         name='Test',
         subject='test',
         from_name='demo@apiconnector.com',
-        html_content='<div>Hello, world!<a href=\"http://$UNSUB$\" style=\"color: black;\"> Unsubscribe from this newsletter</a></div>',
+        html_content='<div>Hello, world!<a href="http://$UNSUB$"> Unsubscribe from this newsletter</a></div>',
         plain_text_content='Hello, world! $UNSUB$'
     )
     test_data[null_parameter] = None
@@ -64,7 +64,7 @@ def test_update_valid_template(connection):
         name='Test',
         subject='test',
         from_name='demo@apiconnector.com',
-        html_content='<div>Hello, world!<a href=\"http://$UNSUB$\" style=\"color: black;\"> Unsubscribe from this newsletter</a></div>',
+        html_content='<div>Hello, world!<a href="http://$UNSUB$"> Unsubscribe from this newsletter</a></div>',
         plain_text_content='Hello, world! $UNSUB$'
     )
     template = template.create()
