@@ -77,9 +77,17 @@ class DotMailerConnection(object):
         if response.ok:
             try:
                 json = response.json()
+
+                if isinstance(json, dict):
+                    json = self.convert_camel_case_dict(json)
+                elif isinstance(json, list):
+                    json = [
+                        self.convert_camel_case_dict(entry)
+                        for entry in json
+                    ]
                 # Next convert the CamelCase variables back to underscore
                 # version to keep inline with PEP8 python, and return
-                return self.convert_camel_case_dict(json)
+                return json
             except ValueError as e:
                 # If requests couldn't decode the JSON then just return
                 # the text output from the response.
