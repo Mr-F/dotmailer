@@ -50,11 +50,13 @@ def test_create_missing_parameter(connection, null_parameter):
         test_template.create()
 
 
+@pytest.mark.notdemo
 def test_update_valid_template(connection):
     """
     Test to confirm that using the API we can successful create a
     template in the user's account.
 
+    NOTE: You can not t
     :param connection:
     :return:
     """
@@ -68,6 +70,7 @@ def test_update_valid_template(connection):
         plain_text_content='Hello, world! $UNSUB$'
     )
     template = template.create()
+
     assert isinstance(template, Template), 'Template type returned'
     assert template.id is not None, 'Template has an ID value'
     template_id = template.id
