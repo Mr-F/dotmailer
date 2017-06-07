@@ -29,6 +29,16 @@ class Constants(object):
 
         self.CAMPAIGN_STATUS_UNSENT = 'Unsent'
 
+        self.PROGRAM_STATUS_DRAFT = 'Draft'
+        self.PROGRAM_STATUS_DEACTIVATED = 'Deactivated'
+        self.PROGRAM_STATUS_ACTIVE = 'Active'
+        self.PROGRAM_STATUS_READONLY = 'ReadOnly'
+        self.PROGRAM_STATUS_NOTAVAILABLEINTHISVERSION = 'NotAvailableInThisVersion'
+
+        self.PROGRAM_ENROLMENT_PROCESSING = 'Processing'
+        self.PROGRAM_ENROLMENT_FINISHED = 'Finished'
+        self.PROGRAM_ENROLMENT_NOTAVAILABLEINTHISVERSION = 'NotAvailableInThisVersion'
+
 
     def __setattr__(self, key, value):
         if self.__dict__.has_key(key):

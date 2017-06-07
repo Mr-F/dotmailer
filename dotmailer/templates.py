@@ -117,13 +117,6 @@ class Template(Base):
             cls.end_point,
             query_params={'Select': select, 'Skip': skip}
         )
-        templates = []
-        for entry in response:
-            t = cls(**entry)
-            print entry['id']
-            print "ID", t.id
-            print '*' * 100
-            print '*' * 100
         templates = [cls(**entry) for entry in response]
         num_of_templates = len(templates)
 
@@ -135,7 +128,7 @@ class Template(Base):
 
             skip += select
             response = connection.get(
-                cls.end_point + '/templates',
+                cls.end_point,
                 query_params={'Select': select, 'Skip': skip}
             )
 
