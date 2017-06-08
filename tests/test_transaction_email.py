@@ -40,8 +40,6 @@ def test_get_stats(connection, aggregate_by):
         datetime.date(2016, 12, 31),
         aggregate_by
     )
-    print response
-    print type(response)
 
     # Loop through the list of aggregated data points, checking that each
     # entry has all the expected keys

@@ -1,0 +1,2 @@
+from dotmailer.program_enrolments import ProgramEnrolment
+

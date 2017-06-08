@@ -1,6 +1,7 @@
 from dotmailer import Base
 from dotmailer.constants import constants
 from dotmailer.connection import connection
+from dotmailer.exceptions import ErrorEnrolmentInvalid
 
 
 class ProgramEnrolment(Base):
@@ -44,13 +45,21 @@ class ProgramEnrolment(Base):
         
         :return: 
         """
-        return type(self).get_faults(self.id)
+        # Before proceeding check that the instance has an enrolment ID
+        # specified.  If not raise an error.
+        if self.id is None:
+            raise ErrorEnrolmentInvalid()
 
+        # Since the functionality is the same, with the exception that
+        # we already know the ID value call the class instance passing
+        # self.id in.
+        return type(self).get_faults(self.id)
 
     @classmethod
     def get(cls, id):
         """
-        
+        Gets a program enrolment by ID
+
         :param id: The ID of the enrolment.  This ID is a GUID and 
             looking something like b0ff06d6-af04-4af8-a299-51bcbad94c1c
         :return: 
@@ -62,6 +71,13 @@ class ProgramEnrolment(Base):
 
     @classmethod
     def get_finished(cls, select=1000, skip=0):
+        """
+        Gets program enrolments which have a finished status
+        
+        :param select: 
+        :param skip: 
+        :return: 
+        """
         response = connection.get(
             '{}/{}'.format(
                 cls.end_point, constants.PROGRAM_ENROLMENT_FINISHED),
@@ -71,6 +87,13 @@ class ProgramEnrolment(Base):
 
     @classmethod
     def get_processing(cls, select=1000, skip=0):
+        """
+        Gets program enrolments which have a processing status
+        
+        :param select: 
+        :param skip: 
+        :return: 
+        """
         response = connection.get(
             '{}/{}'.format(
                 cls.end_point, constants.PROGRAM_ENROLMENT_PROCESSING),

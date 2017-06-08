@@ -1,5 +1,4 @@
 from dotmailer import Base
-from dotmailer.constants import constants
 from dotmailer.connection import connection
 
 
