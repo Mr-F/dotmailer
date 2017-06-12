@@ -13,6 +13,7 @@ class AddressBook(Base):
     visibility: All address books are created as 'Private' by
         default but you can set it as 'Public' upon creation should you
         wish to. This needs to be included within the request body.
+        
     """
 
     end_point = '/v2/address-books'
@@ -136,7 +137,7 @@ class AddressBook(Base):
         Gets all address books within the specified limits.  This function
         performs a query to return all the address books, limited by the
         select and skip values.  To easily get all the address books
-        associated with the account call :get_all:`~AddressBook.get_all`.
+        associated with the account call :func:`~AddressBook.get_all`.
 
         :param select: The select parameter requires a number between 1
         and 1000 (0 is not a valid number). You may only select a maximum
@@ -310,8 +311,9 @@ class AddressBook(Base):
         Function to help determine if the name value specified is a valid
         based upon DotMailer's specification
 
-        :param value: The name for an address book which should be
+        :param value: The name for an address book which should be 
         validated
+        
         :return: A boolean value indicating if the value given is valid
         """
 
