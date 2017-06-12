@@ -21,6 +21,10 @@ class AddressBook(Base):
 
     def __init__(self, **kwargs):
         self.required_fields = ['name']
+
+        # Reassign `delete` to reference the instance method rather
+        # than the class method version.
+        self.delete = self._delete
         super(AddressBook, self).__init__(**kwargs)
 
     def param_dict(self):
@@ -31,25 +35,29 @@ class AddressBook(Base):
 
     def create(self):
         """
-        Creates an address book
-
-        :return:
+        Creates an address book.  If the current instance is associated
+        with a DotMailer ID then an exception will be raised.
+        
+        :return: 
         """
 
         if not self.valid_name(self.name):
+            raise Exception()
+
+        if self.id is not None:
             raise Exception()
 
         response = connection.post(
             self.end_point,
             self.param_dict()
         )
-
         self._update_values(response)
-        return self
 
     def update(self):
         """
-        Updates an address book
+        Updates an address book.  If either the name is invalid or the 
+        instance doesn't have a DotMailer ID associated with it, then an
+        exception will be raised.
 
         :return:
         """
@@ -65,11 +73,11 @@ class AddressBook(Base):
             self.param_dict()
         )
         self._update_values(response)
-        return self
 
-    def delete(self):
+    def _delete(self):
         """
-        Deletes an address book
+        Deletes this address book.  When calling on an instance use 
+        `instance.delete()`.
 
         :return:
         """
@@ -81,12 +89,24 @@ class AddressBook(Base):
 
         # Attempt to issue the delete request to DotMailer to remove the
         # address book
-        response = connection.delete(self.end_point + str(self.id))
+        type(self).delete(self.id)
 
         # Clear the current ID value so we can't accidently call this
         # delete call multiple times
         self.id = None
-        return self
+
+    @classmethod
+    def delete(cls, id):
+        """
+        Deletes an address book by ID
+        
+        :param id: 
+        :return: 
+        """
+        connection.delete(
+            '{}/{}'.format(cls.end_point, id)
+        )
+        return True
 
     @classmethod
     def get(cls, id):

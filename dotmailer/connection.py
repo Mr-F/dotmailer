@@ -75,9 +75,12 @@ class DotMailerConnection(object):
         # The response status code was a success then process the
         # response and return to the caller
         if response.ok:
+
             try:
                 json = response.json()
 
+                # Next convert the CamelCase variables back to underscore
+                # version to keep inline with PEP8 python, and return
                 if isinstance(json, dict):
                     json = self.convert_camel_case_dict(json)
                 elif isinstance(json, list):
@@ -85,8 +88,7 @@ class DotMailerConnection(object):
                         self.convert_camel_case_dict(entry)
                         for entry in json
                     ]
-                # Next convert the CamelCase variables back to underscore
-                # version to keep inline with PEP8 python, and return
+
                 return json
             except ValueError as e:
                 # If requests couldn't decode the JSON then just return
@@ -100,10 +102,19 @@ class DotMailerConnection(object):
             exception_class_name = 'ErrorAccountInvalid'
         else:
             message = response.json()['message']
+
+            # Currently aware of two type of error message formatting
+            # which we need to parse.  These are
+            #   'Address book cannot be written to via the API. ERROR_ADDRESSBOOK_NOTWRITABLE'
+            #   'Error: ERROR_ADDRESSBOOK_NOT_FOUND'
+            if message.startswith('Error: '):
+                message = message[7:]
+
             exception_class_name = message[
                 message.find('.')+1:
             ].strip().title().replace('_','')
-
+            print "Message =", message
+            print "Exception class =", exception_class_name
         raise getattr(exceptions, exception_class_name)()
 
     def put(self, end_point, payload):

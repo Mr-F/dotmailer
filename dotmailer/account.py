@@ -1,5 +1,5 @@
-
 from dotmailer.connection import connection
+
 
 class Account(object):
 

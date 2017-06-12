@@ -84,3 +84,6 @@ class TransactionEmail(Base):
                 'AggregatedBy': aggregate_by
             }
         )
+
+    # @staticmethod
+    # def send_

@@ -17,6 +17,36 @@ class CampaignSends(Base):
 
 
 class Campaign(Base):
+    """
+    
+    Required Values
+    name: The name of the campaign being created
+    
+    subject: The email subject line of the campaign
+
+    from_name: The from name of the campaign
+    
+
+    html_content: The HTML content of the campaign that lies between 
+        the opening <body> and the closing </body> only (the <body> tags 
+        themselves should not be used).
+    
+    plain_text_content: The plain text content of the campaign    
+    
+    Optional Values
+    from_address: The email of an existing custom from address you
+        wish to use, which needs to be included within the request body
+
+    reply_action: The required action to be taken when a reply to the 
+        campaign is sent by the recipient. Possible values for this
+        attribute are 'Unset', 'WebMailForward', 'Webmail', 'Delete'
+
+    reply_to_address: The email address that you would like replies to
+        be forwarded to, which needs to be included within the request 
+        body
+    
+    
+    """
 
     end_point = '/v2/campaigns'
     name = None
@@ -44,6 +74,20 @@ class Campaign(Base):
         if 'reply_address' not in kwargs:
             kwargs['reply_address'] = None
         super(Campaign, self).__init__(**kwargs)
+
+    def _update_values(self, data):
+        """
+        The campagin has an odd attribute which is the from address 
+        field.  We just need to store the email address which needs to
+        be pulled out and assigned
+        :param data: 
+        :return: 
+        """
+        from_address = data.pop('from_address', None)
+        if from_address is not None:
+            data['from_address'] = from_address['email']
+
+        super(Campaign, self)._update_values(data)
 
     def param_dict(self):
         return {

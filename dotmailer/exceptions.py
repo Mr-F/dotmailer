@@ -60,7 +60,7 @@ class ErrorAddressbookNotFound(Exception):
               ' the account you are currently connected to.'
 
 
-class ErrorAddressbookNotWritable(Exception):
+class ErrorAddressbookNotwritable(Exception):
     """
     DotMailer Exception: ERROR_ADDRESSBOOK_NOTWRITABLE
     """

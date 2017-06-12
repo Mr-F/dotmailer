@@ -29,9 +29,9 @@ def pytest_collection_modifyitems(config, items):
 
 @pytest.fixture(scope='session')
 def connection(request):
-    config = ConfigParser.ConfigParser()
-    config.read(os.path.abspath(request.config.inicfg.config.path))
+    # config = ConfigParser.ConfigParser()
+    # config.read(os.path.abspath(request.config.inicfg.config.path))
     Account.setup_connection(
-        username=config.get('pytest', 'username'),
-        password=config.get('pytest', 'password')
+        username=request.config.getini('username'),
+        password=request.config.getini('password')
     )

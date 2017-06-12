@@ -8,31 +8,35 @@ class Contact(Base):
     This class represents a DotMailer contact.  To be able to create a 
     contact, you must specify the email of the contact.
     
-    Required Fields
+    ``Required keyword arguments``
     
-    email: A string containing the email address of the contact that you
-        wish to add.
+    **email** - `A string containing the email address of the contact 
+    that you wish to add.`
     
-    Optional Fields
+    ``Optional keywoard arguments``
     
-    opt_in_type: A string which represents the type of optin that the
-        contact performed.  You can either specify these values by hand
-        or use the pre-defined constant values
+    **opt_in_type** -  `A string which represents the type of optin 
+    that the contact performed.  You can either specify these values 
+    by hand or use the pre-defined constant values.`
             
-            Unknown = constants.CONTACT_OPTINTYPE_UNKNOWN
-            Single  = constants.CONTACT_OPTINTYPE_SINGLE
-            Double  = constants.CONTACT_OPTINTYPE_DOUBLE
-            VerifiedDouble = constants.CONTACT_OPTINTYPE_VERIFIEDDOUBLE
+            * :class:`Constants`.CONTACT_OPTINTYPE_UNKNOWN
+            * :class:`Constants`.CONTACT_OPTINTYPE_SINGLE
+            * :class:`Constants`.CONTACT_OPTINTYPE_DOUBLE
+            * :class:`Constants`.CONTACT_OPTINTYPE_VERIFIEDDOUBLE
     
-    email_type: A string representing the type of email that the contac
-        would prefer to receive.  This can be either plain text or HTML.
-        Alternatively use the constant values
+    **email_type** - `A string representing the type of email that the 
+    contact would prefer to receive.  This can be either plain text or 
+    HTML. Alternatively use the constant values.`
         
-            HTML  = constatns.CONTACT_EMAILTYPE_HTML
-            plain text = constants.CONTACT_EMAILTYPE_PLAIN
+            * :class:`Constants`.CONTACT_EMAILTYPE_HTML
+            * :class:`Constants`.CONTACT_EMAILTYPE_PLAIN
     
-    data_fields: A list of typles which defined any data fields and
-        value that should be associated with the contact.
+    **data_fields** - `A list of tuples which defined any data fields 
+    and value that should be associated with the contact e.g`
+    
+    .. code-block:: python
+    
+        [('FavouriteColour', 'Red'), ('age': 23)]
     """
 
     end_point = '/v2/contacts'
@@ -43,6 +47,10 @@ class Contact(Base):
 
     def __init__(self, **kwargs):
         self.required_fields = ['email']
+
+        # Reassign `delete` to reference the instance method rather
+        # than the class method version.
+        self.delete = self._delete
 
         # Setup the other optional fields to the default value if they have not
         # been specified.
@@ -79,29 +87,13 @@ class Contact(Base):
             self.param_dict()
         )
         self._update_values(response)
-        return self
-
-    def delete(self):
-        """
-        Deletes a contact
-
-        :return:
-        """
-        self.validate_id('Sorry, unable to delete contact as no ID value is'
-                         'defined for this contact.')
-
-        # Attempt to issue the delete request to DotMailer to remove the
-        # address book
-        response = connection.delete(self.end_point + str(self.id))
-
-        # Clear the current ID value so we can't accidently call this
-        # delete call multiple times
-        self.id = None
-        return self
 
     def update(self):
         """
-        Updates a contact
+        Updates an existing contact's data.  Unlike the DotMailer's API
+        you currently can NOT create a contact using the update value and
+        assigning an ID value of zero.  If you need to create a contact
+        then please use the create method.
 
         :return:
         """
@@ -114,11 +106,37 @@ class Contact(Base):
         self._update_values(response)
         return self
 
+    def _delete(self):
+        """
+        Deletes an existing contact.  When calling on an instance use 
+        `instance.delete()`.
+
+        :return:
+        """
+        self.validate_id('Sorry, unable to delete contact as no ID value is'
+                         'defined for this contact.')
+
+        # Attempt to issue the delete request to DotMailer to remove the
+        # address book
+        type(self).delete(self.id)
+
+        # Clear the current ID value so we can't accidently call this
+        # delete call multiple times
+        self.id = None
+        return self
+
+    @classmethod
+    def delete(cls, id):
+        connection.delete(
+            '{}/{}'.format(cls.end_point, id)
+        )
+        return True
+
     def add_to_address_book(self, address_book):
         """
-        Adds a contact to a given address book
+        Adds a contact to a specific address book
 
-        :param address_book:
+        :param address_book: This should be an instance of :class:`AddressBook`
         :return:
         """
         address_book.add_contact(self)
