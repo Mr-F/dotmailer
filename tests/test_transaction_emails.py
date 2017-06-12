@@ -1,6 +1,6 @@
 import pytest
 import datetime
-from dotmailer.transactional_email import TransactionEmail
+from dotmailer.transactional_emails import TransactionEmail
 
 
 def test_valid_send(connection):
