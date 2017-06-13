@@ -7,27 +7,27 @@ class Template(Base):
     This class represents a DotMailer template.  To be able to create a 
     template you will need to define the following required fields:
     
-    name: The name of the template being created, which needs to be 
-        included within the request body
+    **name** `The name of the template being created, which needs to be 
+    included within the request body.`
         
-    subject: The email subject line of the template, which needs to be 
-        included within the request body
+    **subject** `The email subject line of the template, which needs to 
+    be included within the request body.`
     
-    from_name: The from name of the template, which needs to be 
-        included within the request body
+    **from_name** `The from name of the template, which needs to be 
+    included within the request body.`
     
-    html_content: The HTML content of the template, which needs to be 
-        included within the request body
+    **html_content** `The HTML content of the template, which needs to 
+    be included within the request body.`
     
-    plain_text_content: The plain text content of the template, which 
-        needs to be included within the request body
+    **plain_text_content** `The plain text content of the template, 
+    which needs to be included within the request body.`
     
     To access an existing template from your account, you can either 
     obtain a copy of the template by accessing it directly using it's 
-    unique ID value via the `get` class method.  Alternatively if you 
-    don't know the it's ID, then use the `get_all` to return a list of 
-    all the templates that you currently have defined within your 
-    account.
+    unique ID value via the :func:`get` class method.  Alternatively if 
+    you don't know the it's ID, then use the :func:`get_all` to return 
+    a list of  all the templates that you currently have defined within 
+    your account.
     """
 
     end_point = '/v2/templates'
@@ -54,23 +54,20 @@ class Template(Base):
 
     def create(self):
         """
-        This operation can be used to create a new template within your 
-        account.
+        Create a new DotMailer template.
         
-        :return: 
+        This function will issue the create request to DotMailer's API,
+        passing through all the information you have defined. 
         """
         response = connection.post(
             self.end_point,
             self.param_dict()
         )
         self._update_values(response)
-        return self
 
     def update(self):
         """
-        Updates the template
-        
-        :return: 
+        Updates the template 
         """
         self.validate_id('Sorry unable to update this template as no ID value '
                          'has been defined.')
@@ -82,15 +79,21 @@ class Template(Base):
             self.param_dict()
         )
         self._update_values(response)
-        return self
 
     @classmethod
     def get(cls, id):
         """
-        Gets a template by ID
+        Attempt to get a specific template from DotMailer by it's ID value.
         
-        :param id: The ID of the template
-        :return: 
+        If the ID specified can not be found/is not associated with your
+        account then :class:`dotmailer.exceptions.ErrorTemplateNotFound`
+        will be raised.
+        
+        :param id: The ID of the template.
+        
+        :return: A :class:`Template` instance, which represents the \
+        DotMailer template.
+        
         """
         id = int(id)
 
@@ -105,9 +108,14 @@ class Template(Base):
     @classmethod
     def get_all(cls):
         """
-        Gets a list of all the templates in your account.
+        Attempt to get a list of all the templates that you have associated
+        with your account.
         
-        :return: 
+        This function continues to request for more templates until the 
+        server doesn't return any more templates.
+        
+        :return: A list containing :class:`Template` objects that \
+        represents all the templates that are associated with your account        
         """
         all_templates = []
         select = 1000

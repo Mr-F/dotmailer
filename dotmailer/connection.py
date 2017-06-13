@@ -39,16 +39,6 @@ class DotMailerConnection(object):
         data_dict.items()
         }
 
-    def __init__(self):
-        """
-
-        :param username: The API account username
-        :param password: The API account password
-        """
-        # self.username = username
-        # self.password = password
-        pass
-
     def _do_request(self, method, url, **kwargs):
         """
         This internal function provides the actual functionality to
