@@ -31,12 +31,13 @@ class Contact(Base):
             * :class:`Constants`.CONTACT_EMAILTYPE_HTML
             * :class:`Constants`.CONTACT_EMAILTYPE_PLAIN
     
-    **data_fields** - `A list of tuples which defined any data fields 
+    **data_fields** - `A dictionary of values which any data fields 
     and value that should be associated with the contact e.g`
     
     .. code-block:: python
+        
+        { 'FavouriteColour': 'Red', 'age': 23}
     
-        [('FavouriteColour', 'Red'), ('age': 23)]
     """
 
     end_point = '/v2/contacts'
@@ -276,8 +277,44 @@ class Contact(Base):
         )
         return [cls(**entry) for entry in response]
 
-    # TODO: Create a wrapper function for 'get_contacts_since' to perform a series of calls to get all contacts
+    @classmethod
+    def get_all_contacts_since(cls, date, with_full_data=True):
+        """
+        Get all the contacts that have been created since a specific 
+        date.  
+        
+        This function will automatically handle making all the calls
+        required to get a complete list i.e. if there are more than
+        1000 contacts since the specified date.
+        
+        :param date: 
+        :param with_full_data: 
+        :return: 
+        """
+        select = 1000
+        skip = 0
+        all_contacts = []
 
-    # TODO: bulk create contacts
+        contacts = cls.get_contacts_since(date, with_full_data, select, skip)
+        num_of_entries = len(contacts)
+        while num_of_entries > 0:
+            all_contacts.extend(contacts)
+            if num_of_entries < select:
+                break
+
+            skip += select
+            contacts = cls.get_contacts_since(date, with_full_data, select, skip)
+            num_of_entries = len(contacts)
+
+        return all_contacts
+
+    @classmethod
+    def bulk_create(cls, file):
+
+        # Check we can access the file
+
+
+
+        pass
 
     # TODO: bulk create contacts in address book
