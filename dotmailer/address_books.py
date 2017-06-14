@@ -246,7 +246,7 @@ class AddressBook(Base):
                          'book.')
 
         connection.post(
-            self.end_point + '/' + str(self.id),
+            '{}/{}/contacts'.format(self.end_point, self.id),
             contact.param_dict()
         )
 
