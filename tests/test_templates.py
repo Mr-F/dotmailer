@@ -18,10 +18,9 @@ def test_create_valid_template(connection):
         html_content='<div>Hello, world!<a href="http://$UNSUB$"> Unsubscribe from this newsletter</a></div>',
         plain_text_content='Hello, world! $UNSUB$'
     )
-    template = test_template.create()
+    test_template.create()
 
-    assert isinstance(template, Template), 'Template type returned'
-    assert template.id is not None, 'Template has an ID value'
+    assert test_template.id is not None, 'Template has an ID value'
 
 
 @pytest.mark.parametrize('null_parameter', ['name', 'subject', 'from_name',
@@ -69,9 +68,8 @@ def test_update_valid_template(connection):
         html_content='<div>Hello, world!<a href="http://$UNSUB$"> Unsubscribe from this newsletter</a></div>',
         plain_text_content='Hello, world! $UNSUB$'
     )
-    template = template.create()
+    template.create()
 
-    assert isinstance(template, Template), 'Template type returned'
     assert template.id is not None, 'Template has an ID value'
     template_id = template.id
 

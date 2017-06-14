@@ -36,7 +36,10 @@ class Contact(Base):
     
     .. code-block:: python
         
-        { 'FavouriteColour': 'Red', 'age': 23}
+        { 
+            'FavouriteColour': 'Red', 
+            'age': 23
+        }
     
     """
 
@@ -52,6 +55,9 @@ class Contact(Base):
         # Reassign `delete` to reference the instance method rather
         # than the class method version.
         self.delete = self._delete
+        self.unsubscribe = self._unsubscribe
+
+        self.get_score_by_id = self._get_score_by_id
 
         # Setup the other optional fields to the default value if they have not
         # been specified.
@@ -62,6 +68,19 @@ class Contact(Base):
         if 'data_fields' not in kwargs:
             kwargs['data_fields'] = None
         super(Contact, self).__init__(**kwargs)
+
+
+    def _update_values(self, data):
+        if 'data_fields' in data:
+            # If the data fields is a list then this is likely to be
+            # coming back from the server as a list of dictionaries
+            # so we need to unpack them
+            if isinstance(data['data_fields'], list):
+                data['data_fields'] = {
+                    entry['key']:entry['value']
+                    for entry in data['data_fields']
+                }
+        super(Contact, self)._update_values(data)
 
     def param_dict(self):
         contact_data_fields = []
@@ -195,7 +214,7 @@ class Contact(Base):
         """
         # TODO: Add some type checking in to make sure that the value supplied is actually an int
         response = connection.get(
-            cls.end_point + '/' + id
+            '{}/{}'.format(cls.end_point, id)
         )
         return cls(**response)
 
@@ -309,12 +328,295 @@ class Contact(Base):
         return all_contacts
 
     @classmethod
-    def bulk_create(cls, file):
+    def bulk_create(cls, filedata):
+        """
+        Bulk creates, or bulk updates, contacts.
+        
+        This function allows you to upload a bulk number of contacts to 
+        the server.  The contact data must be in either a CSV or Excel
+        format, and it must include one column that is called 'Email' or
+        equivalent if your account is using a language other than 
+        English.  All other columns will be mapped to your custom contact
+        data fields.
+        
+        Currently DotMailer place a file upload limit of 10MB.  If your
+        data is larger than this then you will need to split it into
+        small chunks.
+        
+        The API will return an ID for the import, and the current status.
+        You can re-query the import status later, by using the unique
+        ID value.
+        
+        :param filedata:  Either a file or filepath which can be read from 
+        :return: 
+        """
 
-        # Check we can access the file
+        url = '{}/imports'.format(cls.end_point)
+
+        if isinstance(filedata, file):
+            files = {'file': filedata}
+            result = connection.put(url, {}, files=files)
+        else:
+            with open(filedata, 'r') as data:
+                files = {'file': filedata}
+                result = connection.put(url, {}, files=files)
+
+        return result
 
 
+    # TODO: Since this uses a different end point, should we move this to the address-book class and just call into it from here?
+    @classmethod
+    def bulk_create_in_address_book(cls, address_book, filedata):
+        """
+        Bulk creates, or bulk updates, contacts in an address book.
+        
+        Similar to the bulk create verions, this function can be used to
+        create a bulk number of contacts in one go.  However, this
+        version will also automatically associate the contact with the
+        address book that has been specified.  The contact data must be 
+        in either a CSV or Excel format, and it must include one column 
+        that is called 'Email' or equivalent if your account is using a 
+        language other than English.  All other columns will be mapped 
+        to your custom contact data fields.
+        
+        Currently DotMailer place a file upload limit of 10MB.  If your
+        data is larger than this then you will need to split it into
+        small chunks.
+        
+        The API will return an ID for the import, and the current status.
+        You can re-query the import status later, by using the unique
+        ID value.
+        
+        :param address_book: 
+        :param filedata: 
+        :return: 
+        """
 
-        pass
+        url = '/v2/address-book/{}/contacts/imports'.format(address_book.id)
 
-    # TODO: bulk create contacts in address book
+        if isinstance(filedata, file):
+            files = {'file': filedata}
+            result = connection.put(url, {}, files=files)
+        else:
+            with open(filedata, 'r') as data:
+                files = {'file': filedata}
+                result = connection.put(url, {}, files=files)
+
+        return result
+
+    @classmethod
+    def get_contact_import_status(cls, id):
+        """
+        Gets the import status of a previously started contact import.
+        
+        :param id: The bulk upload ID value returned when you submitted
+         a bulk upload request.  The ID is a GUID and should look similar
+         to 842d81e8-c619-457f-bb77-ab6c4a17da39.
+        :return: A dictionary that contains an the keys 'id' and 'status'.
+        """
+        return connection.get(
+            '{}/imports/{}'.format(cls.end_point, id)
+        )
+
+    @classmethod
+    def get_contact_import_report(cls, id):
+        """
+        Gets a report with statistics about what was successfully 
+        imported, and what was unable to be imported.
+        
+        :param id: 
+        :return: 
+        """
+        return connection.get(
+            '{}/imports/{}/report'.format(cls.end_point, id)
+        )
+
+    # @classmethod
+    # def get_contact_import_report(cls, id):
+    #     """
+    #     Gets a report with statistics about what was successfully
+    #     imported, and what was unable to be imported.
+    #
+    #     :param id:
+    #     :return:
+    #     """
+    #
+    #     return connection.get(
+    #         '{}/imports/{}/report-faults'.format(cls.end_point, id)
+    #     )
+
+
+    # https://developer.dotmailer.com/docs/get-contacts-from-address-book
+
+    # https://developer.dotmailer.com/docs/get-modified-contacts-in-address-book-since-date
+
+    # https://developer.dotmailer.com/docs/get-modified-contacts-since-date
+
+    # https://developer.dotmailer.com/docs/get-suppressed-contacts-since-date
+
+    # https://developer.dotmailer.com/docs/get-unsubscribed-contacts-since-date
+
+    # https://developer.dotmailer.com/docs/get-unsubscribed-contacts-from-address-book-since-date
+
+    # https://developer.dotmailer.com/docs/unsubscribe-contact
+
+    def _unsubscribe(self):
+        return type(self).unsubscribe(self.email)
+
+    @classmethod
+    def unsubscribe(cls, email):
+        """
+        Unsubscribes contact from account
+        
+        :param id: 
+        :return: 
+        """
+        return connection.post(
+            '{}/unsubscribe'.format(cls.end_point),
+            {
+                'Email': email
+            }
+        )
+
+    # https://developer.dotmailer.com/docs/unsubscribe-contact-from-address-book
+
+    def _resubscribe(self, preferred_local=None, return_url_to_use_if_challenged=None):
+        return type(self).resubscribe(self.email, preferred_local, return_url_to_use_if_challenged)
+
+    @classmethod
+    def resubscribe(cls, email, preferred_local=None, return_url_to_use_if_challenged=None):
+        payload = {
+            'UnsubscribedContact': {
+                'Email': email
+            }
+        }
+        if preferred_local is not None:
+            payload['PreferredLocale'] = preferred_local
+        if return_url_to_use_if_challenged is not None:
+            payload['ReturnUrlToUseIfChallenged'] = return_url_to_use_if_challenged
+
+        return connection.post(
+            '{}/resubscribe'.format(cls.end_point),
+            payload
+        )
+
+    # https://developer.dotmailer.com/docs/resubscribe-contact-to-address-book
+
+    @classmethod
+    def get_scoring(cls, select, skip):
+        """
+        
+        :param select: 
+        :param skip: 
+        :return: 
+        """
+        return connection.get(
+            '{}/score/'.format(cls.end_point),
+            query_params={
+                'Select': select, 'Skip': skip
+            }
+        )
+
+    @classmethod
+    def get_all_scoring(cls):
+        """
+        
+        :return: 
+        """
+        all_scoring = []
+        select = 1000
+        skip = 0
+        scorings = cls.get_scoring(select, skip)
+        num_of_entries = len(scorings)
+        while num_of_entries > 0:
+            all_scoring.extend(scorings)
+            if num_of_entries < select:
+                break
+            skip += select
+            scorings = cls.get_scoring(select, skip)
+            num_of_entries = len(scorings)
+        return all_scoring
+
+    @classmethod
+    def get_scoring_in_address_book(cls, address_book, select, skip):
+        """
+        Gets contact scoring for contacts within a specific address book or segment
+
+        :param address_book:
+        :param select: 
+        :param skip: 
+        :return: 
+        """
+        return connection.get(
+            '/v2/address-books/{}/contacts/score/'.format(address_book.id),
+            query_params={
+                'Select': select, 'Skip': skip
+            }
+        )
+
+    @classmethod
+    def get_all_scoring_in_address_book(cls, address_book):
+        all_scoring = []
+        select = 1000
+        skip = 0
+        scorings = cls.get_scoring_in_address_book(address_book, select, skip)
+        num_of_entries = len(scorings)
+        while num_of_entries > 0:
+            all_scoring.extend(scorings)
+            if num_of_entries < select:
+                break
+            skip += select
+            scorings = cls.get_scoring_in_address_book(address_book, select, skip)
+            num_of_entries = len(scorings)
+        return all_scoring
+
+    @classmethod
+    def get_scores_modified_since(cls, date, select, skip):
+        return connection.get(
+            '{}/score/modified-since/{}'.format(
+                cls.end_point, date.strftime('%Y-%m-%d')
+            ),
+            query_params={
+                'Select': select, 'Skip': skip
+            }
+        )
+
+    @classmethod
+    def get_all_scores_modified_since(cls, date):
+        all_scoring = []
+        select = 1000
+        skip = 0
+        scorings = cls.get_scores_modified_since(date, select, skip)
+        num_of_entries = len(scorings)
+        while num_of_entries > 0:
+            all_scoring.extend(scorings)
+            if num_of_entries < select:
+                break
+            skip += select
+            scorings = cls.get_scores_modified_since(date, select, skip)
+            num_of_entries = len(scorings)
+        return all_scoring
+
+    @classmethod
+    def get_score_by_email(cls, email):
+        """
+        Gets contact scoring for a contact by email address
+
+        :param email: 
+        :return: 
+        """
+        return connection.get(
+            '{}/{}/score'.format(cls.end_point, email)
+        )
+
+    @classmethod
+    def get_score_by_id(cls, id):
+        """
+        Gets contact scoring for a contact by ID
+        
+        :param id: 
+        :return: 
+        """
+        return connection.get(
+            '{}/{}/score'.format(cls.end_point, id)
+        )

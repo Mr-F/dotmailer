@@ -107,18 +107,20 @@ class DotMailerConnection(object):
             print "Exception class =", exception_class_name
         raise getattr(exceptions, exception_class_name)()
 
-    def put(self, end_point, payload):
+    def put(self, end_point, payload, **kwargs):
+        kwargs['json'] = payload
         return self._do_request(
             'put',
             self.url + end_point,
-            json=payload
+            **kwargs
         )
 
-    def post(self, end_point, payload):
+    def post(self, end_point, payload, **kwargs):
+        kwargs['json'] = payload
         return self._do_request(
             'post',
             self.url + end_point,
-            json=payload
+            **kwargs
         )
 
     def delete(self, end_point):

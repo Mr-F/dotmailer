@@ -33,11 +33,11 @@ class TransactionEmail(Base):
 
     def param_dict(self):
         data = {
-            'ToAddress': ','.join(self.to_address),
-            'Subject': self.subject,
-            'FromAddress': self.from_address,
-            'HtmlContent': self.html_content,
-            'PlainTextContent': self.plain_text_content
+            'toAddress': ','.join(self.to_address),
+            'subject': self.subject,
+            'fromAddress': self.from_address,
+            'htmlContent': self.html_content,
+            'plainTextContent': self.plain_text_content
         }
         if self.cc_address != []:
             data['CCAddress'] = ','.join(self.cc_address)
@@ -85,5 +85,30 @@ class TransactionEmail(Base):
             }
         )
 
-    # @staticmethod
-    # def send_
+    @classmethod
+    def send_transactional_triggered_campaign(cls, to_address, campaign_id, personalisation_values=None):
+        """
+        
+        :param to_address: A single email address which the campaign should be sent to.
+        :param campaign_id: The DotMailer ID value of the campaign you wish to trigger.
+        :param personalisation_values: A dictionary of any personalisation values that should be used to fill in the
+         email.
+        :return: 
+        """
+
+
+        # TODO: Waiting to hear back from DotMailer to find out if you send multiple recipients how personalisation values are handled
+        param_data = {
+            'toAddress': [to_address],
+            'campaignId': campaign_id
+        }
+        if personalisation_values is not None:
+            param_data['personalisationValues'] = [
+                {'Name': key, 'Value': value} for key, value in personalisation_values.items()
+            ]
+
+        return connection.post(
+            '{}/triggered-campaign'.format(cls.end_point),
+            param_data
+        )
+
