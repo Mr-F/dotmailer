@@ -333,7 +333,8 @@ class Contact(Base):
                 break
 
             skip += select
-            contacts = cls.get_contacts_since(date, with_full_data, select, skip)
+            contacts = cls.get_contacts_since(
+                date, with_full_data, select, skip)
             num_of_entries = len(contacts)
 
         return all_contacts
@@ -456,7 +457,8 @@ class Contact(Base):
 
     # TODO: Should this be a call into the address book object
     @classmethod
-    def get_contacts_from_address_book(cls, address_book, with_full_data=True, select=1000, skip=0):
+    def get_contacts_from_address_book(cls, address_book, with_full_data=True,
+                                       select=1000, skip=0):
         response = connection.get(
             '/v2/address-books/{}/contacts'.format(address_book.id),
             query_params={
@@ -467,26 +469,33 @@ class Contact(Base):
 
     # TODO: Should this be a call into the address book object
     @classmethod
-    def get_all_contacts_from_address_book(cls, address_book, with_full_data=True):
+    def get_all_contacts_from_address_book(cls, address_book,
+                                           with_full_data=True):
         all_contacts = []
         select = 1000
         skip = 0
-        contacts = cls.get_contacts_from_address_book(address_book, with_full_data)
+        contacts = cls.get_contacts_from_address_book(
+            address_book, with_full_data)
         num_of_entries = len(contacts)
         while num_of_entries > 0:
             all_contacts.extend(contacts)
             if num_of_entries < select:
                 break
             skip += select
-            contacts = cls.get_contacts_from_address_book(address_book, with_full_data)
+            contacts = cls.get_contacts_from_address_book(
+                address_book, with_full_data)
             num_of_entries = len(contacts)
         return all_contacts
 
     # TODO: Should this be a call into the address book object
     @classmethod
-    def get_modified_contacts_from_address_book_since(cls, address_book, date, with_full_data=True, select=1000, skip=0):
+    def get_modified_contacts_from_address_book_since(cls, address_book, date,
+                                                      with_full_data=True,
+                                                      select=1000, skip=0):
         response = connection.get(
-            '/v2/address-books/{}/contacts/modified-since/{}'.format(address_book.id, date.strftime('%Y-%m-%d')),
+            '/v2/address-books/{}/contacts/modified-since/{}'.format(
+                address_book.id, date.strftime('%Y-%m-%d')
+            ),
             query_params={
                 'withFullData': with_full_data, 'select': select, 'skip': skip
             }
@@ -495,26 +504,34 @@ class Contact(Base):
 
     # TODO: Should this be a call into the address book object
     @classmethod
-    def get_all_modified_contacts_from_address_book_since(cls, address_book, date, with_full_data=True):
+    def get_all_modified_contacts_from_address_book_since(cls, address_book,
+                                                          date,
+                                                          with_full_data=True):
         all_contacts = []
         select = 1000
         skip = 0
-        contacts = cls.get_modified_contacts_from_address_book_since(address_book, date, with_full_data, select, skip)
+        contacts = cls.get_modified_contacts_from_address_book_since(
+            address_book, date, with_full_data, select, skip
+        )
         num_of_entries = len(contacts)
         while num_of_entries > 0:
             all_contacts.extend(contacts)
             if num_of_entries < select:
                 break
             skip += select
-            contacts = cls.get_modified_contacts_from_address_book_since(address_book, date, with_full_data, select,
-                                                                         skip)
+            contacts = cls.get_modified_contacts_from_address_book_since(
+                address_book, date, with_full_data, select, skip
+            )
             num_of_entries = len(contacts)
         return all_contacts
 
     @classmethod
-    def get_modified_contacts_since(cls, date, with_full_data=True, select=1000, skip=0):
+    def get_modified_contacts_since(cls, date, with_full_data=True, select=1000,
+                                    skip=0):
         response = connection.get(
-            '{}/modified-since/{}'.format(cls.end_point, date.strftime('%Y-%m-%d')),
+            '{}/modified-since/{}'.format(
+                cls.end_point, date.strftime('%Y-%m-%d')
+            ),
             query_params={
                 'withFullData': with_full_data, 'select': select, 'skip': skip
             }
@@ -526,26 +543,32 @@ class Contact(Base):
         all_contacts = []
         select = 1000
         skip = 0
-        contacts = cls.get_modified_contacts_since(date, with_full_data, select, skip)
+        contacts = cls.get_modified_contacts_since(
+            date, with_full_data, select, skip
+        )
         num_of_entries = len(contacts)
         while num_of_entries > 0:
             all_contacts.extend(contacts)
             if num_of_entries < select:
                 break
             skip += select
-            contacts = cls.get_modified_contacts_since(date, with_full_data, select, skip)
+            contacts = cls.get_modified_contacts_since(
+                date, with_full_data, select, skip
+            )
             num_of_entries = len(contacts)
         return all_contacts
 
     # @classmethod
     # def get_suppressed_contacts_since(cls, date, select=1000, skip=0):
     #     response = connection.get(
-    #         '{}/suppressed-since/{}'.format(cls.end_point, date.strftime('%Y-%m-%d')),
+    #         '{}/suppressed-since/{}'.format(
+    #             cls.end_point, date.strftime('%Y-%m-%d')
+    #         ),
     #         query_params={
     #             'select': select, 'skip': skip
     #         }
     #     )
-    # TODO: Need to think how to handle these objects since they are nested with additional information
+    #     # TODO: Need to think how to handle these objects since they are nested with additional information
     #     return [Contact(**entry) for entry in response]
     #
     # @classmethod
@@ -567,7 +590,9 @@ class Contact(Base):
     # @classmethod
     # def get_unsubscribed_contacts_since(cls, date, select=1000, skip=0):
     #     response = connection.get(
-    #         '{}/unsubscribed-since/{}'.format(cls.end_point, date.strftime('%Y-%m-%d')),
+    #         '{}/unsubscribed-since/{}'.format(
+    #             cls.end_point, date.strftime('%Y-%m-%d')
+    #         ),
     #         query_params={
     #             'select': select, 'skip': skip
     #         }
@@ -592,9 +617,13 @@ class Contact(Base):
     #     return all_contacts
     #
     # @classmethod
-    # def get_unsubscribed_contacts_from_address_book_since(cls, address_book, date, select=1000, skip=0):
+    # def get_unsubscribed_contacts_from_address_book_since(cls, address_book,
+    #                                                       date, select=1000,
+    #                                                       skip=0):
     #     response = connection.get(
-    #         '/v2/address-books/{}/contacts/unsubscribed-since/{}'.format(address_book.id, date.strftime('%Y-%m-%d')),
+    #         '/v2/address-books/{}/contacts/unsubscribed-since/{}'.format(
+    #             address_book.id, date.strftime('%Y-%m-%d')
+    #         ),
     #         query_params={
     #             'select': select, 'skip': skip
     #         }
@@ -603,18 +632,23 @@ class Contact(Base):
     #     return [Contact(**entry) for entry in response]
     #
     # @classmethod
-    # def get_all_unsubscribed_contacts_from_address_book_since(cls, address_book, date):
+    # def get_all_unsubscribed_contacts_from_address_book_since(cls, address_book,
+    #                                                           date):
     #     all_contacts = []
     #     select = 1000
     #     skip = 0
-    #     contacts = cls.get_unsubscribed_contacts_from_address_book_since(address_book, date, select, skip)
+    #     contacts = cls.get_unsubscribed_contacts_from_address_book_since(
+    #         address_book, date, select, skip
+    #     )
     #     num_of_entries = len(contacts)
     #     while num_of_entries > 0:
     #         all_contacts.extend(contacts)
     #         if num_of_entries < select:
     #             break
     #         skip += select
-    #         contacts = cls.get_unsubscribed_contacts_from_address_book_since(address_book, date, select, skip)
+    #         contacts = cls.get_unsubscribed_contacts_from_address_book_since(
+    #             address_book, date, select, skip
+    #         )
     #         num_of_entries = len(contacts)
     #     return all_contacts
 
@@ -636,11 +670,15 @@ class Contact(Base):
             }
         )
 
-    def _resubscribe(self, preferred_local=None, return_url_to_use_if_challenged=None):
-        return type(self).resubscribe(self.email, preferred_local, return_url_to_use_if_challenged)
+    def _resubscribe(self, preferred_local=None,
+                     return_url_to_use_if_challenged=None):
+        return type(self).resubscribe(
+            self.email, preferred_local, return_url_to_use_if_challenged
+        )
 
     @classmethod
-    def resubscribe(cls, email, preferred_local=None, return_url_to_use_if_challenged=None):
+    def resubscribe(cls, email, preferred_local=None,
+                    return_url_to_use_if_challenged=None):
         payload = {
             'UnsubscribedContact': {
                 'Email': email
@@ -694,7 +732,8 @@ class Contact(Base):
     @classmethod
     def get_scoring_in_address_book(cls, address_book, select, skip):
         """
-        Gets contact scoring for contacts within a specific address book or segment
+        Gets contact scoring for contacts within a specific address 
+        book or segment
 
         :param address_book:
         :param select: 
@@ -720,7 +759,9 @@ class Contact(Base):
             if num_of_entries < select:
                 break
             skip += select
-            scorings = cls.get_scoring_in_address_book(address_book, select, skip)
+            scorings = cls.get_scoring_in_address_book(
+                address_book, select, skip
+            )
             num_of_entries = len(scorings)
         return all_scoring
 
