@@ -70,7 +70,6 @@ class ContactDataField(Base):
             self.param_dict()
         )
         self._update_values(response)
-        return self
 
     def delete(self):
         """
@@ -89,13 +88,9 @@ class ContactDataField(Base):
         if not self.valid_name(self.name):
             raise Exception(self.invalid_name_msg)
 
-        # TODO: Possibly could put in some validation to make sure tha called isn't trying to delete one of the reserved contact data fields
-        response = connection.delete(
+        return connection.delete(
             '{}/{}'.format(self.end_point, self.name)
         )
-
-        if not response['result']:
-            raise Exception()
 
     @classmethod
     def get_contact_fields(cls):
