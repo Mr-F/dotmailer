@@ -57,8 +57,6 @@ class Contact(Base):
         self.delete = self._delete
         self.unsubscribe = self._unsubscribe
 
-        self.get_score_by_id = self._get_score_by_id
-
         # Setup the other optional fields to the default value if they have not
         # been specified.
         if 'opt_in_type' not in kwargs:
@@ -273,7 +271,21 @@ class Contact(Base):
         )
         return [cls(**entry) for entry in response]
 
-    # TODO: Create a wrapper function for 'get_contacts' to perform a series of calls to get all contacts
+    @classmethod
+    def get_all_contact(cls):
+        all_contacts = []
+        select = 1000
+        skip = 0
+        contacts = cls.get_contacts(select, skip)
+        num_of_entries = len(contacts)
+        while num_of_entries > 0:
+            all_contacts.extend(contacts)
+            if num_of_entries < select:
+                break
+            skip += select
+            contacts = cls.get_contacts(select, skip)
+            num_of_entries = len(contacts)
+        return all_contacts
 
     @classmethod
     def get_contacts_since(cls, date, with_full_data=True, select=1000, skip=0):
@@ -360,9 +372,7 @@ class Contact(Base):
             with open(filedata, 'r') as data:
                 files = {'file': filedata}
                 result = connection.put(url, {}, files=files)
-
         return result
-
 
     # TODO: Since this uses a different end point, should we move this to the address-book class and just call into it from here?
     @classmethod
@@ -428,37 +438,186 @@ class Contact(Base):
         :return: 
         """
         return connection.get(
-            '{}/imports/{}/report'.format(cls.end_point, id)
+            '{}/import/{}/report'.format(cls.end_point, id)
         )
 
+    @classmethod
+    def get_contact_import_report_faults(cls, id):
+        """
+        Gets a report with statistics about what was successfully
+        imported, and what was unable to be imported.
+
+        :param id:
+        :return:
+        """
+
+        return connection.get(
+            '{}/import/{}/report-faults'.format(cls.end_point, id)
+        )
+
+    # TODO: Should this be a call into the address book object
+    @classmethod
+    def get_contacts_from_address_book(cls, address_book, with_full_data=True, select=1000, skip=0):
+        response = connection.get(
+            '/v2/address-books/{}/contacts'.format(address_book.id),
+            query_params={
+                'withFullData': with_full_data, 'select':select, 'skip': skip
+            }
+        )
+        return [Contact(**entry) for entry in response]
+
+    # TODO: Should this be a call into the address book object
+    @classmethod
+    def get_all_contacts_from_address_book(cls, address_book, with_full_data=True):
+        all_contacts = []
+        select = 1000
+        skip = 0
+        contacts = cls.get_contacts_from_address_book(address_book, with_full_data)
+        num_of_entries = len(contacts)
+        while num_of_entries > 0:
+            all_contacts.extend(contacts)
+            if num_of_entries < select:
+                break
+            skip += select
+            contacts = cls.get_contacts_from_address_book(address_book, with_full_data)
+            num_of_entries = len(contacts)
+        return all_contacts
+
+    # TODO: Should this be a call into the address book object
+    @classmethod
+    def get_modified_contacts_from_address_book_since(cls, address_book, date, with_full_data=True, select=1000, skip=0):
+        response = connection.get(
+            '/v2/address-books/{}/contacts/modified-since/{}'.format(address_book.id, date.strftime('%Y-%m-%d')),
+            query_params={
+                'withFullData': with_full_data, 'select': select, 'skip': skip
+            }
+        )
+        return [Contact(**entry) for entry in response]
+
+    # TODO: Should this be a call into the address book object
+    @classmethod
+    def get_all_modified_contacts_from_address_book_since(cls, address_book, date, with_full_data=True):
+        all_contacts = []
+        select = 1000
+        skip = 0
+        contacts = cls.get_modified_contacts_from_address_book_since(address_book, date, with_full_data, select, skip)
+        num_of_entries = len(contacts)
+        while num_of_entries > 0:
+            all_contacts.extend(contacts)
+            if num_of_entries < select:
+                break
+            skip += select
+            contacts = cls.get_modified_contacts_from_address_book_since(address_book, date, with_full_data, select,
+                                                                         skip)
+            num_of_entries = len(contacts)
+        return all_contacts
+
+    @classmethod
+    def get_modified_contacts_since(cls, date, with_full_data=True, select=1000, skip=0):
+        response = connection.get(
+            '{}/modified-since/{}'.format(cls.end_point, date.strftime('%Y-%m-%d')),
+            query_params={
+                'withFullData': with_full_data, 'select': select, 'skip': skip
+            }
+        )
+        return [Contact(**entry) for entry in response]
+
+    @classmethod
+    def get_all_modified_contacts_since(cls, date, with_full_data=True):
+        all_contacts = []
+        select = 1000
+        skip = 0
+        contacts = cls.get_modified_contacts_since(date, with_full_data, select, skip)
+        num_of_entries = len(contacts)
+        while num_of_entries > 0:
+            all_contacts.extend(contacts)
+            if num_of_entries < select:
+                break
+            skip += select
+            contacts = cls.get_modified_contacts_since(date, with_full_data, select, skip)
+            num_of_entries = len(contacts)
+        return all_contacts
+
     # @classmethod
-    # def get_contact_import_report(cls, id):
-    #     """
-    #     Gets a report with statistics about what was successfully
-    #     imported, and what was unable to be imported.
-    #
-    #     :param id:
-    #     :return:
-    #     """
-    #
-    #     return connection.get(
-    #         '{}/imports/{}/report-faults'.format(cls.end_point, id)
+    # def get_suppressed_contacts_since(cls, date, select=1000, skip=0):
+    #     response = connection.get(
+    #         '{}/suppressed-since/{}'.format(cls.end_point, date.strftime('%Y-%m-%d')),
+    #         query_params={
+    #             'select': select, 'skip': skip
+    #         }
     #     )
-
-
-    # https://developer.dotmailer.com/docs/get-contacts-from-address-book
-
-    # https://developer.dotmailer.com/docs/get-modified-contacts-in-address-book-since-date
-
-    # https://developer.dotmailer.com/docs/get-modified-contacts-since-date
-
-    # https://developer.dotmailer.com/docs/get-suppressed-contacts-since-date
-
-    # https://developer.dotmailer.com/docs/get-unsubscribed-contacts-since-date
-
-    # https://developer.dotmailer.com/docs/get-unsubscribed-contacts-from-address-book-since-date
-
-    # https://developer.dotmailer.com/docs/unsubscribe-contact
+    # TODO: Need to think how to handle these objects since they are nested with additional information
+    #     return [Contact(**entry) for entry in response]
+    #
+    # @classmethod
+    # def get_all_suppressed_contacts_since(cls, date):
+    #     all_contacts = []
+    #     select = 1000
+    #     skip = 0
+    #     contacts = cls.get_suppressed_contacts_since(date, select, skip)
+    #     num_of_entries = len(contacts)
+    #     while num_of_entries > 0:
+    #         all_contacts.extend(contacts)
+    #         if num_of_entries < select:
+    #             break
+    #         skip += select
+    #         contacts = cls.get_suppressed_contacts_since(date, select, skip)
+    #         num_of_entries = len(contacts)
+    #     return all_contacts
+    #
+    # @classmethod
+    # def get_unsubscribed_contacts_since(cls, date, select=1000, skip=0):
+    #     response = connection.get(
+    #         '{}/unsubscribed-since/{}'.format(cls.end_point, date.strftime('%Y-%m-%d')),
+    #         query_params={
+    #             'select': select, 'skip': skip
+    #         }
+    #     )
+    #     # TODO: Need to think how to handle these objects since they are nested with additional information
+    #     return [Contact(**entry) for entry in response]
+    #
+    # @classmethod
+    # def get_all_unsubscribed_contacts_since(cls, date, select=1000, skip=0):
+    #     all_contacts = []
+    #     select = 1000
+    #     skip = 0
+    #     contacts = cls.get_unsubscribed_contacts_since(date, select, skip)
+    #     num_of_entries = len(contacts)
+    #     while num_of_entries > 0:
+    #         all_contacts.extend(contacts)
+    #         if num_of_entries < 0:
+    #             break
+    #         skip += select
+    #         contacts = cls.get_unsubscribed_contacts_since(date, select, skip)
+    #         num_of_entries = len(contacts)
+    #     return all_contacts
+    #
+    # @classmethod
+    # def get_unsubscribed_contacts_from_address_book_since(cls, address_book, date, select=1000, skip=0):
+    #     response = connection.get(
+    #         '/v2/address-books/{}/contacts/unsubscribed-since/{}'.format(address_book.id, date.strftime('%Y-%m-%d')),
+    #         query_params={
+    #             'select': select, 'skip': skip
+    #         }
+    #     )
+    #     # TODO: Need to think how to handle these objects since they are nested with additional information
+    #     return [Contact(**entry) for entry in response]
+    #
+    # @classmethod
+    # def get_all_unsubscribed_contacts_from_address_book_since(cls, address_book, date):
+    #     all_contacts = []
+    #     select = 1000
+    #     skip = 0
+    #     contacts = cls.get_unsubscribed_contacts_from_address_book_since(address_book, date, select, skip)
+    #     num_of_entries = len(contacts)
+    #     while num_of_entries > 0:
+    #         all_contacts.extend(contacts)
+    #         if num_of_entries < select:
+    #             break
+    #         skip += select
+    #         contacts = cls.get_unsubscribed_contacts_from_address_book_since(address_book, date, select, skip)
+    #         num_of_entries = len(contacts)
+    #     return all_contacts
 
     def _unsubscribe(self):
         return type(self).unsubscribe(self.email)
@@ -468,7 +627,7 @@ class Contact(Base):
         """
         Unsubscribes contact from account
         
-        :param id: 
+        :param email: 
         :return: 
         """
         return connection.post(
@@ -477,8 +636,6 @@ class Contact(Base):
                 'Email': email
             }
         )
-
-    # https://developer.dotmailer.com/docs/unsubscribe-contact-from-address-book
 
     def _resubscribe(self, preferred_local=None, return_url_to_use_if_challenged=None):
         return type(self).resubscribe(self.email, preferred_local, return_url_to_use_if_challenged)
@@ -499,8 +656,6 @@ class Contact(Base):
             '{}/resubscribe'.format(cls.end_point),
             payload
         )
-
-    # https://developer.dotmailer.com/docs/resubscribe-contact-to-address-book
 
     @classmethod
     def get_scoring(cls, select, skip):

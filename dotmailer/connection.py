@@ -3,6 +3,7 @@ import requests
 import re
 
 from requests.auth import HTTPBasicAuth
+
 from dotmailer import exceptions
 
 class DotMailerConnection(object):
@@ -67,20 +68,20 @@ class DotMailerConnection(object):
         if response.ok:
 
             try:
-                json = response.json()
+                json_data = response.json()
 
                 # Next convert the CamelCase variables back to underscore
                 # version to keep inline with PEP8 python, and return
-                if isinstance(json, dict):
-                    json = self.convert_camel_case_dict(json)
-                elif isinstance(json, list):
-                    json = [
+                if isinstance(json_data, dict):
+                    json_data = self.convert_camel_case_dict(json_data)
+                elif isinstance(json_data, list):
+                    json_data = [
                         self.convert_camel_case_dict(entry)
-                        for entry in json
+                        for entry in json_data
                     ]
 
-                return json
-            except ValueError as e:
+                return json_data
+            except json.JSONDecodeError as e:
                 # If requests couldn't decode the JSON then just return
                 # the text output from the response.
                 return response.text
@@ -91,6 +92,7 @@ class DotMailerConnection(object):
         if response.status_code == 401:
             exception_class_name = 'ErrorAccountInvalid'
         else:
+
             message = response.json()['message']
 
             # Currently aware of two type of error message formatting
