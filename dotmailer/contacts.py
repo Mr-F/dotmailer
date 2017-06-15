@@ -1,4 +1,5 @@
 from dotmailer import Base
+from dotmailer.contact_score import ContactScore
 from dotmailer.constants import constants
 from dotmailer.connection import connection
 from dotmailer.address_books import AddressBook
@@ -672,9 +673,20 @@ class Contact(Base):
 
     def _resubscribe(self, preferred_local=None,
                      return_url_to_use_if_challenged=None):
-        return type(self).resubscribe(
+        contact, status = type(self).resubscribe(
             self.email, preferred_local, return_url_to_use_if_challenged
         )
+
+        # TODO: Look at a more dynamic way of this use __dict__ to pull out the variables that have been defined (excluding ID)
+        data = {
+            'email': contact.email,
+            'opt_in_type': contact.opt_in_type,
+            'email_type': contact.email_type,
+            'date_fields': contact.data_fields,
+            'status': contact.status
+        }
+        self._update_values(data)
+        return status
 
     @classmethod
     def resubscribe(cls, email, preferred_local=None,
@@ -689,10 +701,13 @@ class Contact(Base):
         if return_url_to_use_if_challenged is not None:
             payload['ReturnUrlToUseIfChallenged'] = return_url_to_use_if_challenged
 
-        return connection.post(
+        response = connection.post(
             '{}/resubscribe'.format(cls.end_point),
             payload
         )
+        return Contact(**response['contact']), response['status']
+
+    # https://developer.dotmailer.com/docs/resubscribe-contact-to-address-book
 
     @classmethod
     def get_scoring(cls, select, skip):
@@ -702,12 +717,13 @@ class Contact(Base):
         :param skip: 
         :return: 
         """
-        return connection.get(
+        response = connection.get(
             '{}/score/'.format(cls.end_point),
             query_params={
                 'Select': select, 'Skip': skip
             }
         )
+        return [ContactScore(**entry) for entry in response]
 
     @classmethod
     def get_all_scoring(cls):
@@ -740,12 +756,13 @@ class Contact(Base):
         :param skip: 
         :return: 
         """
-        return connection.get(
+        response = connection.get(
             '/v2/address-books/{}/contacts/score/'.format(address_book.id),
             query_params={
                 'Select': select, 'Skip': skip
             }
         )
+        return [ContactScore(**entry) for entry in response]
 
     @classmethod
     def get_all_scoring_in_address_book(cls, address_book):
@@ -767,7 +784,7 @@ class Contact(Base):
 
     @classmethod
     def get_scores_modified_since(cls, date, select, skip):
-        return connection.get(
+        response = connection.get(
             '{}/score/modified-since/{}'.format(
                 cls.end_point, date.strftime('%Y-%m-%d')
             ),
@@ -775,6 +792,7 @@ class Contact(Base):
                 'Select': select, 'Skip': skip
             }
         )
+        return [ContactScore(**entry) for entry in response]
 
     @classmethod
     def get_all_scores_modified_since(cls, date):
@@ -800,9 +818,10 @@ class Contact(Base):
         :param email: 
         :return: 
         """
-        return connection.get(
+        response = connection.get(
             '{}/{}/score'.format(cls.end_point, email)
         )
+        return ContactScore(**response)
 
     @classmethod
     def get_score_by_id(cls, id):
@@ -812,6 +831,7 @@ class Contact(Base):
         :param id: 
         :return: 
         """
-        return connection.get(
+        response = connection.get(
             '{}/{}/score'.format(cls.end_point, id)
         )
+        return ContactScore(**response)
