@@ -11,6 +11,7 @@ Welcome to dotmailer's documentation!
     connection
     constants
     contact_data_fields
+    contact_score
     contacts
     exceptions
     program_enrolments
