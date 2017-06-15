@@ -67,7 +67,6 @@ class Contact(Base):
             kwargs['data_fields'] = None
         super(Contact, self).__init__(**kwargs)
 
-
     def _update_values(self, data):
         if 'data_fields' in data:
             # If the data fields is a list then this is likely to be
@@ -75,7 +74,7 @@ class Contact(Base):
             # so we need to unpack them
             if isinstance(data['data_fields'], list):
                 data['data_fields'] = {
-                    entry['key']:entry['value']
+                    entry['key']: entry['value']
                     for entry in data['data_fields']
                 }
         super(Contact, self)._update_values(data)
@@ -84,7 +83,7 @@ class Contact(Base):
         contact_data_fields = []
         if self.data_fields is not None:
             contact_data_fields = [
-                {'key': key, 'value':value}
+                {'key': key, 'value': value}
                 for key, value in self.data_fields.items()
             ]
         return {
@@ -302,7 +301,7 @@ class Contact(Base):
             '{}/created-since/{}'.format(
                 cls.end_point, date.strftime('%Y-%m-%d')
             ),
-            query_param = {
+            query_param={
                 'WithFullData': with_full_data, 'Select': select, 'Skip': skip
             }
         )
@@ -370,7 +369,7 @@ class Contact(Base):
             result = connection.put(url, {}, files=files)
         else:
             with open(filedata, 'r') as data:
-                files = {'file': filedata}
+                files = {'file': data}
                 result = connection.put(url, {}, files=files)
         return result
 
@@ -409,7 +408,7 @@ class Contact(Base):
             result = connection.put(url, {}, files=files)
         else:
             with open(filedata, 'r') as data:
-                files = {'file': filedata}
+                files = {'file': data}
                 result = connection.put(url, {}, files=files)
 
         return result
@@ -461,7 +460,7 @@ class Contact(Base):
         response = connection.get(
             '/v2/address-books/{}/contacts'.format(address_book.id),
             query_params={
-                'withFullData': with_full_data, 'select':select, 'skip': skip
+                'withFullData': with_full_data, 'select': select, 'skip': skip
             }
         )
         return [Contact(**entry) for entry in response]
