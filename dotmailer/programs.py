@@ -13,22 +13,14 @@ class Program(Base):
     date_created = None
 
     @classmethod
-    def get(cls, id):
-        """
-        Gets a program by ID
-        
-        :param id: The ID of the program
-        :return: 
-        """
-        id = int(id)
-
-        if id < 1:
-            raise Exception()
-
+    def get(cls, select=1000, skip=0):
         response = connection.get(
-            '{}/{}'.format(cls.end_point, id)
+            cls.end_point,
+            query_params={
+                'select': select, 'skip': skip
+            }
         )
-        return cls(**response)
+        return [cls(**entry) for entry in response]
 
     @classmethod
     def get_all(cls):
@@ -63,3 +55,21 @@ class Program(Base):
             num_of_programs = len(programs)
 
         return programs
+
+    @classmethod
+    def get_by_id(cls, id):
+        """
+        Gets a program by ID
+
+        :param id: The ID of the program
+        :return: 
+        """
+        id = int(id)
+
+        if id < 1:
+            raise Exception()
+
+        response = connection.get(
+            '{}/{}'.format(cls.end_point, id)
+        )
+        return cls(**response)

@@ -1,5 +1,8 @@
 Constants
 =========
 
-.. automodule:: dotmailer.constants
+.. autoclass:: dotmailer.constants.Constants
     :members:
+    :undoc-members:
+
+

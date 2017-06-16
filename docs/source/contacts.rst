@@ -1,5 +1,5 @@
 Contacts
 ========
 
-.. automodule:: dotmailer.contacts
+.. autoclass:: dotmailer.contacts.Contact
     :members:

@@ -1,5 +1,5 @@
 Contact score
 =============
 
-.. automodule:: dotmailer.contact_score
+.. autoclass:: dotmailer.contacts.ContactScore
     :members:

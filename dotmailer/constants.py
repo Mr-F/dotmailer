@@ -2,6 +2,11 @@ class ConstError(TypeError):
     pass
 
 class Constants(object):
+    """
+    The constants object contains a list of constant values.
+    
+    These constant values have been predefined by DotMailer.
+    """
 
     def __init__(self):
 
@@ -38,6 +43,12 @@ class Constants(object):
         self.PROGRAM_ENROLMENT_PROCESSING = 'Processing'
         self.PROGRAM_ENROLMENT_FINISHED = 'Finished'
         self.PROGRAM_ENROLMENT_NOTAVAILABLEINTHISVERSION = 'NotAvailableInThisVersion'
+
+        self.SEGMENT_STATUS_NOTSTARTED = 'NotStarted'
+        self.SEGMENT_STATUS_NOTFINISHED = 'NotFinished'
+        self.SEGMENT_STATUS_FINISHED = 'Finished'
+        self.SEGMENT_STATUS_FAILED = 'Failed'
+        self.SEGMENT_STATUS_NOTAVAILABLEINTHISVERSION = 'NotAvailableInThisVersion'
 
 
     def __setattr__(self, key, value):

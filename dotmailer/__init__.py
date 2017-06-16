@@ -1,6 +1,23 @@
 import datetime
 import dotmailer.connection as dmconnection
-import re
+from dateutil.parser import parse as date_parser
+
+
+def get_server_time():
+    """
+    Gets the UTC time as set on the server.
+    
+    This function returns the UTC time as set on the server so you 
+    can be sure that any dateTime dependent calls that you make are 
+    going to happen at the time you think they will.
+    
+    :return: The time on the server represented as a DateTime object
+     with the correct timezone applied.
+    """
+    return date_parser(
+        dmconnection.get('/v2/server-time')
+    )
+
 
 class Base(object):
 
@@ -21,8 +38,9 @@ class Base(object):
         for field in self.required_fields:
             if field not in kwargs:
                 raise KeyError(
-                    'You must specify {} when creating a template'.format(
-                        field))
+                    'You must specify {} when creating a {}'.format(
+                        field, type(self).__name__)
+                )
         self._update_values(kwargs)
 
     def _update_values(self, data):
@@ -67,4 +85,60 @@ class Base(object):
         return date.strftime(self.date_format)
 
     def strptime(self, date_string):
+        if isinstance(date_string, datetime.datetime):
+            return date_string
+
         return datetime.datetime.strptime(date_string, self.date_format)
+
+
+class Folder(Base):
+
+    parent_id = None
+    name = None
+    child_folder = None
+
+    def __init__(self, **kwargs):
+        self.required_fields = ['name', 'parent_id']
+        if 'parent_id' not in kwargs:
+            kwargs['parent_id'] = 0
+        super(Folder, self).__init__(**kwargs)
+
+    def param_dict(self):
+        return {
+            'Name': self.name
+        }
+
+    def create(self):
+        response = dmconnection.post(
+            '{}/{}'.format(self.end_point, self.parent_id)
+        )
+        self._update_values(response)
+
+    @classmethod
+    def get(cls):
+        response = dmconnection.get(
+            '{}'.foramt(cls.end_point)
+        )
+        # TODO: Implement this bit to recursively convert all the elements and child_folders into document folder objects
+        return response
+
+
+class File(Base):
+
+    name = None
+    local_path = None
+
+    def __init__(self, **kwargs):
+        self.required_fields = ['name']
+        super(File, self).__init__(**kwargs)
+
+    def _create(self, folder):
+        if self.local_path is None:
+            raise Exception('No local path to the file')
+        with open(self.local_path, 'r') as file_data:
+            response = connection.post(
+                self.end_point.format(folder.id),
+                files={'file': file_data}
+            )
+            response['local_path'] = None
+            return self._update_values(response)

@@ -1,8 +1,31 @@
 from dotmailer import Base
-from dotmailer.contact_score import ContactScore
 from dotmailer.constants import constants
 from dotmailer.connection import connection
 from dotmailer.address_books import AddressBook
+
+
+class ContactScore(Base):
+    """
+    Scoring information about a specific contact.
+    
+    """
+    contact_id = None
+    email = None
+    date_modified = None
+    score_label = None
+    score = None
+    engagement = None
+    suitability = None
+
+    def _update_values(self, data):
+        # Attempt to convert strings to the appropriate data type for contact
+        # scores.
+        for key in ['contact_id', 'score', 'engagement', 'suitability']:
+            if key in data and data[key] is not None:
+                data[key] = int(data[key])
+        data['date_modified'] = self.strptime(data['date_modified'])
+        super(ContactScore, self)._update_values(data)
+
 
 class Contact(Base):
     """
@@ -69,6 +92,7 @@ class Contact(Base):
         super(Contact, self).__init__(**kwargs)
 
     def _update_values(self, data):
+        print data
         if 'data_fields' in data:
             # If the data fields is a list then this is likely to be
             # coming back from the server as a list of dictionaries
@@ -115,8 +139,9 @@ class Contact(Base):
 
         :return:
         """
+        print "ID =", self.id
         self.validate_id('Sorry unable to update this contact as no ID value'
-                         'has been defined.')
+                         ' has been defined.')
         response = connection.put(
             '{}/{}'.format(self.end_point, self.id),
             self.param_dict()
