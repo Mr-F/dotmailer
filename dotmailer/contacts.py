@@ -1,3 +1,5 @@
+import StringIO
+
 from dotmailer import Base
 from dotmailer.constants import constants
 from dotmailer.connection import connection
@@ -391,7 +393,7 @@ class Contact(Base):
 
         url = '{}/imports'.format(cls.end_point)
 
-        if isinstance(filedata, file):
+        if isinstance(filedata, (file, StringIO)):
             files = {'file': filedata}
             result = connection.put(url, {}, files=files)
         else:
@@ -430,7 +432,7 @@ class Contact(Base):
 
         url = '/v2/address-book/{}/contacts/imports'.format(address_book.id)
 
-        if isinstance(filedata, file):
+        if isinstance(filedata, (file, StringIO)):
             files = {'file': filedata}
             result = connection.put(url, {}, files=files)
         else:
