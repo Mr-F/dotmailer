@@ -1,4 +1,4 @@
-import StringIO
+from StringIO import StringIO
 
 from dotmailer import Base
 from dotmailer.constants import constants
