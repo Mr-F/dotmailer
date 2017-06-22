@@ -395,11 +395,11 @@ class Contact(Base):
 
         if isinstance(filedata, (file, StringIO)):
             files = {'file': filedata}
-            result = connection.put(url, {}, files=files)
+            result = connection.post(url, {}, files=files)
         else:
             with open(filedata, 'r') as data:
                 files = {'file': data}
-                result = connection.put(url, {}, files=files)
+                result = connection.post(url, {}, files=files)
         return result
 
     # TODO: Since this uses a different end point, should we move this to the address-book class and just call into it from here?
@@ -434,11 +434,11 @@ class Contact(Base):
 
         if isinstance(filedata, (file, StringIO)):
             files = {'file': filedata}
-            result = connection.put(url, {}, files=files)
+            result = connection.post(url, {}, files=files)
         else:
             with open(filedata, 'r') as data:
                 files = {'file': data}
-                result = connection.put(url, {}, files=files)
+                result = connection.post(url, {}, files=files)
 
         return result
 
