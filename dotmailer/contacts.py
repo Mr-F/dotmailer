@@ -1,5 +1,3 @@
-from StringIO import StringIO
-
 from dotmailer import Base
 from dotmailer.constants import constants
 from dotmailer.connection import connection
@@ -393,14 +391,7 @@ class Contact(Base):
 
         url = '{}/imports'.format(cls.end_point)
 
-        if isinstance(filedata, (file, StringIO)):
-            files = {'file': filedata}
-            result = connection.post(url, {}, files=files)
-        else:
-            with open(filedata, 'r') as data:
-                files = {'file': data}
-                result = connection.post(url, {}, files=files)
-        return result
+        return connection.post(url, {}, files={'file': filedata})
 
     # TODO: Since this uses a different end point, should we move this to the address-book class and just call into it from here?
     @classmethod
@@ -432,15 +423,7 @@ class Contact(Base):
 
         url = '/v2/address-book/{}/contacts/imports'.format(address_book.id)
 
-        if isinstance(filedata, (file, StringIO)):
-            files = {'file': filedata}
-            result = connection.post(url, {}, files=files)
-        else:
-            with open(filedata, 'r') as data:
-                files = {'file': data}
-                result = connection.post(url, {}, files=files)
-
-        return result
+        return connection.post(url, {}, files={'file': filedata})
 
     @classmethod
     def get_contact_import_status(cls, id):
