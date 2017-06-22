@@ -421,7 +421,7 @@ class Contact(Base):
         :return: 
         """
 
-        url = '/v2/address-book/{}/contacts/imports'.format(address_book.id)
+        url = '/v2/address-books/{}/contacts/import'.format(address_book.id)
 
         return connection.post(url, {}, files={'file': filedata})
 
