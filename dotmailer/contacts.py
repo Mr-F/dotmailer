@@ -389,7 +389,7 @@ class Contact(Base):
         :return: 
         """
 
-        url = '{}/imports'.format(cls.end_point)
+        url = '{}/import'.format(cls.end_point)
 
         return connection.post(url, {}, files={'file': filedata})
 
