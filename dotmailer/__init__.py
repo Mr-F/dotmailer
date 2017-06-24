@@ -1,5 +1,5 @@
 import datetime
-import dotmailer.connection as dmconnection
+from dotmailer.connection import connection
 from dateutil.parser import parse as date_parser
 
 
@@ -15,7 +15,7 @@ def get_server_time():
      with the correct timezone applied.
     """
     return date_parser(
-        dmconnection.get('/v2/server-time')
+        connection.get('/v2/server-time')
     )
 
 

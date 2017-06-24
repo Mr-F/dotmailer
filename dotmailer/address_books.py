@@ -112,7 +112,7 @@ class AddressBook(Base):
     @classmethod
     def get_by_id(cls, id):
         """
-        Gets an address book by ID
+        Gets an address book by it's ID
 
         :param id: The ID of the address book
         :return:
@@ -242,13 +242,14 @@ class AddressBook(Base):
         """
 
         self.validate_id('Sorry, unable to add contact to the address book'
-                         'as no ID value has been defined for the address '
-                         'book.')
+                         ' as no ID value has been defined for the address'
+                         ' book.')
 
-        connection.post(
+        response = connection.post(
             '{}/{}/contacts'.format(self.end_point, self.id),
             contact.param_dict()
         )
+        contact._update_values(response)
 
     def delete_contact(self, contact):
         """
@@ -258,11 +259,11 @@ class AddressBook(Base):
         :return:
         """
         self.validate_id('Sorry, unable to delete contact from this address'
-                         'book, as no ID value has been defined for the '
-                         'address book.')
+                         ' book, as no ID value has been defined for the '
+                         ' address book.')
 
         contact.validate_id('Sorry, unable to delete this contact from the'
-                            'address book, as the contact has no ID value.')
+                            ' address book, as the contact has no ID value.')
 
         response = connection.delete(
             '{}/{}/contacts/{}'.format(

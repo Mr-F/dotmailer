@@ -1,18 +1,16 @@
 import pytest
 from dotmailer.constants import constants
 from dotmailer.address_books import AddressBook
+from dotmailer.contacts import Contact
 from dotmailer.exceptions import (ErrorAddressbookNotFound,
                                   ErrorAddressbookNotwritable)
 
+from .conftest import sample_address_book_data
 
-_sample_address_book_data = {
-    'name': 'Sample address book',
-    'visibility': constants.VISIBILITY_PRIVATE
-}
 
 
 @pytest.mark.parametrize('test_data', [
-    _sample_address_book_data,
+    sample_address_book_data(),
     {'name': 'Test address book'},
     {'name': 'Test address book', 'visibility': constants.VISIBILITY_PRIVATE},
     {'name': 'Test address book', 'visibility': constants.VISIBILITY_PUBLIC}
@@ -55,7 +53,7 @@ def test_create_invalid_address_book(connection, test_data):
 @pytest.mark.parametrize('test_data',[
     {'name': 'New Value', 'visibility': constants.VISIBILITY_PUBLIC}
 ])
-def test_update_valid_address_book(connection, test_data):
+def test_update_valid_address_book(sample_address_book, test_data):
     """
     Test function to confirm that submitting new values to an existing 
     address book, will result in the values on the server being updated.
@@ -65,8 +63,6 @@ def test_update_valid_address_book(connection, test_data):
     :param test_data: 
     :return: 
     """
-    sample_address_book = AddressBook(**_sample_address_book_data)
-    sample_address_book.create()
     address_book_id = sample_address_book.id
     assert address_book_id is not None
 
@@ -83,7 +79,7 @@ def test_update_valid_address_book(connection, test_data):
 
 
 @pytest.mark.notdemo
-def test_delete_valid_address_book(connection):
+def test_delete_valid_address_book(sample_address_book):
     """
     Test to confirm that the delete functionality for address books 
     behaves  correctly.  Calling the delete on an address book should 
@@ -93,9 +89,7 @@ def test_delete_valid_address_book(connection):
     :param connection: 
     :return: 
     """
-    address_book = AddressBook(**_sample_address_book_data)
-    address_book.create()
-    address_book_id = address_book.id
+    address_book_id = sample_address_book.id
     assert address_book_id is not None, 'Sample address book doesn\'t have an' \
                                         ' ID value.'
 
@@ -149,3 +143,73 @@ def test_delete_protected_address_book(connection, book_name):
     # exception
     with pytest.raises(ErrorAddressbookNotwritable):
         test_book.delete()
+
+
+@pytest.mark.notdemo
+def test_get_by_id(sample_address_book):
+    address_book_id = sample_address_book.id
+    assert address_book_id is not None
+
+    returned_book = AddressBook.get_by_id(address_book_id)
+
+    for key in sample_address_book.__dict__.keys():
+        assert sample_address_book[key] == returned_book[key]
+
+
+# TODO: Add test for get_multiple
+# TODO: Add test for get_private
+# TODO: Add test for get_public
+# TODO: Add test for get_all
+
+
+@pytest.mark.notdemo
+def test_add_contact(sample_address_book):
+    # TODO: Look into improving this test
+    contact = Contact(email='test_add_contact@test.com')
+    sample_address_book.add_contact(contact)
+    assert contact.id is not None
+
+
+def test_add_contact_invalid_address_book(sample_address_book_data,
+                                          sample_contact):
+    address_book = AddressBook(**sample_address_book_data)
+    with pytest.raises(Exception):
+        address_book.add_contact(sample_contact)
+
+@pytest.mark.notdemo
+def test_delete_contact(sample_address_book):
+    contact = Contact(email='test_delete_contact@test.com')
+    sample_address_book.add_contact(contact)
+    assert contact.id is not None
+
+    sample_address_book.delete_contact(contact)
+    # TODO: Figure out how to validate that the user has been removed from the list of contacts associated with this address book
+
+
+def test_delete_contact_invalid_address_book(sample_address_book_data,
+                                             sample_contact):
+    address_book = AddressBook(**sample_address_book_data)
+    with pytest.raises(Exception):
+        address_book.delete_contact(sample_contact)
+
+
+@pytest.mark.notdemo
+def test_delete_contact_invalid_contact(sample_address_book,
+                                        sample_contact_data):
+    contact = Contact(**sample_contact_data)
+    with pytest.raises(Exception):
+        sample_address_book.delete_contact(contact)
+
+
+# TODO: Add test for delete_multiple_contacts
+
+# TODO: Add test for delete_all_contacts
+
+@pytest.mark.parametrize('name, response', [
+    ('', True),
+    ('a', True),
+    ('a'*128, True),
+    ('a'*129, False)
+])
+def test_valid_name(name, response):
+    assert AddressBook.valid_name(name) == response
