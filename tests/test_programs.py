@@ -14,7 +14,7 @@ def test_get_id(connection):
     if len(response) < 1:
         assert False, 'Unable to test as no programs exists'
     id = response[0].id
-    program = Program.get(id)
+    program = Program.get_by_id(id)
     assert type(program) is Program
     assert program.name == response[0].name
     assert program.status == response[0].status
