@@ -43,10 +43,10 @@ class AddressBook(Base):
         """
 
         if not self.valid_name(self.name):
-            raise Exception()
+            raise Exception('Invalid address book name.')
 
         if self.id is not None:
-            raise Exception()
+            raise Exception('This address book already has a DotMailer ID')
 
         response = connection.post(
             self.end_point,
@@ -110,7 +110,7 @@ class AddressBook(Base):
         return True
 
     @classmethod
-    def get(cls, id):
+    def get_by_id(cls, id):
         """
         Gets an address book by ID
 

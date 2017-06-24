@@ -12,6 +12,7 @@ _sample_address_book_data = {
 
 
 @pytest.mark.parametrize('test_data', [
+    _sample_address_book_data,
     {'name': 'Test address book'},
     {'name': 'Test address book', 'visibility': constants.VISIBILITY_PRIVATE},
     {'name': 'Test address book', 'visibility': constants.VISIBILITY_PUBLIC}
@@ -22,17 +23,28 @@ def test_create_valid_address_book(connection, test_data):
     books that they are created.
     
     :param connection: 
+    :param test_data:
     :return: 
     """
     address_book = AddressBook(**test_data)
     address_book.create()
     assert address_book.id is not None
 
+
 @pytest.mark.parametrize('test_data', [
     {'visibility': constants.VISIBILITY_PRIVATE},
-    {'name': 'a' * 200}
+    {'name': 'a' * 200},
+    {}
 ])
 def test_create_invalid_address_book(connection, test_data):
+    """
+    Test to confirm that when attempting to create an invalid address
+    book, that an exception is raised.
+    
+    :param connection: 
+    :param test_data: 
+    :return: 
+    """
 
     with pytest.raises((Exception, KeyError)):
         address_book = AddressBook(**test_data)
@@ -63,9 +75,9 @@ def test_update_valid_address_book(connection, test_data):
         setattr(sample_address_book, key, value)
     sample_address_book.update()
 
-    # Finally query the server for the address book and confirm the new values
-    # where stored.
-    address_book = AddressBook.get(address_book_id)
+    # Finally query the server for the address book and confirm the new
+    # values where stored.
+    address_book = AddressBook.get_by_id(address_book_id)
     for key, value in test_data.items:
         assert getattr(address_book_id, key) == value
 
@@ -88,13 +100,13 @@ def test_delete_valid_address_book(connection):
                                         ' ID value.'
 
     # Tell DotMailer that you wish to delete the address book
-    address_book = AddressBook.get(address_book_id)
+    address_book = AddressBook.get_by_id(address_book_id)
     address_book = address_book.delete()
     assert address_book.id is None, "Address book ID was not nulled"
 
     # Finally
     with pytest.raises(ErrorAddressbookNotFound):
-        AddressBook.get(address_book_id)
+        AddressBook.get_by_id(address_book_id)
 
 
 def test_delete_invalid_address_book(connection):
