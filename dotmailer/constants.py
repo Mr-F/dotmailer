@@ -10,6 +10,7 @@ class Constants(object):
 
     def __init__(self):
 
+        self.DEFAULT_ENDPOINT = 'https://r1-api.dotmailer.com'
 
         self.VISIBILITY_PRIVATE = 'Private'
         self.VISIBILITY_PUBLIC = 'Public'

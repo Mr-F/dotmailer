@@ -5,6 +5,8 @@ import re
 from requests.auth import HTTPBasicAuth
 
 from dotmailer import exceptions
+from dotmailer.constants import constants
+
 
 class DotMailerConnection(object):
     """
@@ -21,7 +23,7 @@ class DotMailerConnection(object):
 
     """
 
-    url = 'https://r1-api.dotmailer.com'
+    url = constants.DEFAULT_ENDPOINT
     username = None
     password = None
 

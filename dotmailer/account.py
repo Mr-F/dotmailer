@@ -1,4 +1,5 @@
 from dotmailer.connection import connection
+from dotmailer.constants import constants
 
 
 class Account(object):
@@ -46,7 +47,30 @@ class Account(object):
         return all_addresses
 
     @staticmethod
-    def setup_connection(username='demo@apiconnector.com', password='demo'):
+    def setup_connection(username='demo@apiconnector.com', password='demo',
+                         endpoint=None):
+        """
+        
+        :param username: Your DotMailer API username 
+        :param password: Your DotMailer API user's password
+        :param endpoint: Your regional DotMailer end point.  If not 
+        specified we will attempt to determine the correct value.  If
+        we can not then the library will default to use 
+        `r1-api.dotmailer.com`.
+        :return: 
+        """
+        connection.url = constants.DEFAULT_ENDPOINT
         connection.username = username
         connection.password = password
+        # If the caller has specific a different end point then use that
+        if endpoint is not None:
+            connection.url = endpoint
+
+        # Else attempt to determine the correct endpoint for the user
+        else:
+            response = Account.get_account_information()
+            for property_dict in response['properties']:
+                if property_dict['name'] == 'ApiEndpoint':
+                    connection.url = property_dict['value']
+
         return connection
