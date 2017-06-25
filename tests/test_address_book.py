@@ -67,15 +67,14 @@ def test_update_valid_address_book(sample_address_book, test_data):
     assert address_book_id is not None
 
     # Force an update of the address book
-    for key, value in test_data.items():
-        setattr(sample_address_book, key, value)
+    sample_address_book._update_values(test_data)
     sample_address_book.update()
 
     # Finally query the server for the address book and confirm the new
     # values where stored.
     address_book = AddressBook.get_by_id(address_book_id)
-    for key, value in test_data.items:
-        assert getattr(address_book_id, key) == value
+    for key, value in test_data.items():
+        assert getattr(address_book, key) == value
 
 
 @pytest.mark.notdemo
@@ -94,8 +93,7 @@ def test_delete_valid_address_book(sample_address_book):
                                         ' ID value.'
 
     # Tell DotMailer that you wish to delete the address book
-    address_book = AddressBook.get_by_id(address_book_id)
-    address_book = address_book.delete()
+    address_book = sample_address_book.delete()
     assert address_book.id is None, "Address book ID was not nulled"
 
     # Finally
@@ -151,9 +149,10 @@ def test_get_by_id(sample_address_book):
     assert address_book_id is not None
 
     returned_book = AddressBook.get_by_id(address_book_id)
-
-    for key in sample_address_book.__dict__.keys():
-        assert sample_address_book[key] == returned_book[key]
+    attribs = ['id', 'name', 'visibility']
+    for attrib in attribs:
+        assert getattr(returned_book, attrib) == getattr(sample_address_book,
+                                                         attrib)
 
 
 # TODO: Add test for get_multiple

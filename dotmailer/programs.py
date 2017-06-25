@@ -13,7 +13,7 @@ class Program(Base):
     date_created = None
 
     @classmethod
-    def get(cls, select=1000, skip=0):
+    def get_multiple(cls, select=1000, skip=0):
         response = connection.get(
             cls.end_point,
             query_params={

@@ -81,7 +81,7 @@ class Template(Base):
         self._update_values(response)
 
     @classmethod
-    def get(cls, id):
+    def get_by_id(cls, id):
         """
         Attempt to get a specific template from DotMailer by it's ID value.
         

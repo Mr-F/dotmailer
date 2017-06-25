@@ -23,4 +23,4 @@ def test_get_id(connection):
 
 def test_invalid_get_id(connection):
     with pytest.raises(Exception):
-        Program.get(0)
+        Program.get_multiple(0)

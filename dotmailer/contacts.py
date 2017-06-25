@@ -147,7 +147,6 @@ class Contact(Base):
             self.param_dict()
         )
         self._update_values(response)
-        return self
 
     def _delete(self):
         """
@@ -166,7 +165,6 @@ class Contact(Base):
         # Clear the current ID value so we can't accidently call this
         # delete call multiple times
         self.id = None
-        return self
 
     @classmethod
     def delete(cls, id):
@@ -281,7 +279,7 @@ class Contact(Base):
         return all_address_books
 
     @classmethod
-    def get_contacts(cls, select=1000, skip=0):
+    def get_multiple(cls, select=1000, skip=0):
         """
         Gets a list of all contacts in the account
 
@@ -297,18 +295,18 @@ class Contact(Base):
         return [cls(**entry) for entry in response]
 
     @classmethod
-    def get_all_contact(cls):
+    def get_all(cls):
         all_contacts = []
         select = 1000
         skip = 0
-        contacts = cls.get_contacts(select, skip)
+        contacts = cls.get_multiple(select, skip)
         num_of_entries = len(contacts)
         while num_of_entries > 0:
             all_contacts.extend(contacts)
             if num_of_entries < select:
                 break
             skip += select
-            contacts = cls.get_contacts(select, skip)
+            contacts = cls.get_multiple(select, skip)
             num_of_entries = len(contacts)
         return all_contacts
 

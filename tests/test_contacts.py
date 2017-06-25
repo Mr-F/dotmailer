@@ -1,9 +1,12 @@
 import pytest
 from dotmailer.contacts import Contact
 from dotmailer.constants import constants
+from dotmailer.exceptions import ErrorContactNotFound
 
+from .conftest import sample_contact_data
 
 @pytest.mark.parametrize('test_data', [
+    sample_contact_data(),
     {'email': 'test@test.com'},
     {'email': 'test@test.com', 'opt_in_type': constants.CONTACT_OPTINTYPE_UNKNOWN},
     {'email': 'test@test.com', 'opt_in_type': constants.CONTACT_OPTINTYPE_SINGLE},
@@ -40,36 +43,44 @@ def test_create_invalid_contact(connection, test_data):
 
 
 @pytest.mark.notdemo
-@pytest.mark.parametrize('original_data, update_data', [
-    (None, {})
+@pytest.mark.parametrize('test_data', [
+    {'email': 'new_email@test.com'},
+    {'opt_in_type': constants.CONTACT_OPTINTYPE_UNKNOWN},
+    {'opt_in_type': constants.CONTACT_OPTINTYPE_VERIFIEDDOUBLE},
+    {'opt_in_type': constants.CONTACT_OPTINTYPE_DOUBLE},
+    {'opt_in_type': constants.CONTACT_OPTINTYPE_SINGLE},
+    {'email_type': constants.CONTACT_EMAILTYPE_HTML},
+    {'email_type': constants.CONTACT_EMAILTYPE_PLAIN}
 ])
-def test_update_valid_contact(connection, original_data, update_data):
-    # TODO: Finish this test off working out test data to push through it
-    if original_data is None:
-        original_data = {
-            'email': 'test@test.com',
-            'opt_in_type': constants.CONTACT_OPTINTYPE_UNKNOWN,
-            'email_type': constants.CONTACT_EMAILTYPE_PLAIN
-        }
-    contact = Contact(**original_data)
-    contact.create()
-    contact._update_values(update_data)
-    contact.update()
+def test_update_valid_contact(sample_contact, test_data):
+
+    sample_contact_id = sample_contact.id
+    assert sample_contact_id is not None
+
+    sample_contact._update_values(test_data)
+    sample_contact.update()
 
     # Build a list of all keys we should have values for and need to test
-    keys = set(original_data.keys())
-    keys.update(update_data.keys())
-    ignore_list = ['data_fields']
-    for key in keys:
-        if key in ignore_list:
-            continue
-        value = getattr(contact, key)
-        if key in update_data:
-            assert type(update_data[key]) == type(value)
-            assert update_data[key] == value
-        else:
-            assert type(original_data[key]) == type(value)
-            assert original_data[key] == value
+    contact = Contact.get_by_id(sample_contact_id)
+    for key, value in test_data.items():
+        assert getattr(contact, key) == value
+
+
+@pytest.mark.notdemo
+def test_delete_valid_contact(sample_contact):
+    sample_contact_id = sample_contact.id
+    assert sample_contact_id is not None
+
+    sample_contact.delete()
+    assert sample_contact.id is None
+
+    with pytest.raises(ErrorContactNotFound):
+        Contact.get_by_id(sample_contact_id)
+
+
+def test_delete_invalid_contact(connection):
+    with pytest.raises(ErrorContactNotFound):
+        Contact.delete(999999999)
 
 
 @pytest.mark.notdemo
@@ -82,3 +93,26 @@ def test_delete_contact(connection):
 
     contact.create()
     Contact.delete(contact.id)
+
+
+def test_get_by_email(sample_contact):
+    returned_contact = Contact.get_by_email(sample_contact.email)
+
+    attribs = ['id', 'email', 'opt_in_type', 'email_type', 'data_fields']
+    for attrib in attribs:
+        assert getattr(returned_contact, attrib) == getattr(sample_contact,
+                                                            attrib)
+
+
+def test_get_by_id(sample_contact):
+    returned_contact = Contact.get_by_id(sample_contact.id)
+
+    attribs = ['id', 'email', 'opt_in_type', 'email_type', 'data_fields']
+    for attrib in attribs:
+        assert getattr(returned_contact, attrib) == getattr(sample_contact,
+                                                            attrib)
+
+# TODO: Add test for get_address_books
+# TODO: Add test for get_all_address_books
+# TODO: Add test for get_multiple
+# TODO: Add test for get_all

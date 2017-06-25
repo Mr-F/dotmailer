@@ -56,7 +56,7 @@ class ProgramEnrolment(Base):
         return type(self).get_faults(self.id)
 
     @classmethod
-    def get(cls, id):
+    def get_by_id(cls, id):
         """
         Gets a program enrolment by ID
 

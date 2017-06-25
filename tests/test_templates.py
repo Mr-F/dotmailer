@@ -76,7 +76,7 @@ def test_update_valid_template(connection):
     template.name = 'New name'
     template.update()
 
-    updated_template = Template.get(template_id)
+    updated_template = Template.get_by_id(template_id)
     assert updated_template.name == 'New name'
 
 
