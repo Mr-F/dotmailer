@@ -109,14 +109,14 @@ class Folder(Base):
         }
 
     def create(self):
-        response = dmconnection.post(
+        response = connection.post(
             '{}/{}'.format(self.end_point, self.parent_id)
         )
         self._update_values(response)
 
     @classmethod
     def get(cls):
-        response = dmconnection.get(
+        response = connection.get(
             '{}'.foramt(cls.end_point)
         )
         # TODO: Implement this bit to recursively convert all the elements and child_folders into document folder objects

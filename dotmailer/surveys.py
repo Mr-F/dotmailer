@@ -66,7 +66,7 @@ class Survey(Base):
         return all_surveys
 
     @classmethod
-    def get(cls, id):
+    def get_by_id(cls, id):
         """
         Get a survey by it's ID value
         
