@@ -103,7 +103,7 @@ class TransactionEmail(Base):
             'campaignId': campaign_id
         }
         if personalisation_values is not None:
-            param_data['personalisationValues'] = [
+            param_data['personalizationValues'] = [
                 {'Name': key, 'Value': value} for key, value in personalisation_values.items()
             ]
 
