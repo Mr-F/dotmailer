@@ -251,3 +251,25 @@ class Campaign(Base):
         self.sends[send.id] = send
         return self
 
+    @classmethod
+    def get_all(cls):
+        """Gets all campaigns
+
+        :return: List of Campaigns
+        """
+        all_campaigns = []
+        select = 1000
+        skip = 0
+
+        while True:
+            response = connection.get(cls.end_point, query_params={'Select': select, 'Skip': skip})
+            campaigns = [cls(**campaign) for campaign in response]
+            all_campaigns.extend(campaigns)
+
+            if len(campaigns) < select:
+                # This means there are no more campaigns to fetch.
+                break
+
+            skip += select
+
+        return all_campaigns
