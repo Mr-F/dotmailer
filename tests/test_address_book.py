@@ -12,8 +12,7 @@ from .conftest import sample_address_book_data
 @pytest.mark.parametrize('test_data', [
     sample_address_book_data(),
     {'name': 'Test address book'},
-    {'name': 'Test address book', 'visibility': constants.VISIBILITY_PRIVATE},
-    {'name': 'Test address book', 'visibility': constants.VISIBILITY_PUBLIC}
+    {'name': 'Test address book', 'visibility': constants.VISIBILITY_PRIVATE}
 ])
 def test_create_valid_address_book(connection, test_data):
     """
@@ -24,6 +23,8 @@ def test_create_valid_address_book(connection, test_data):
     :param test_data:
     :return: 
     """
+    
+
     address_book = AddressBook(**test_data)
     address_book.create()
     assert address_book.id is not None

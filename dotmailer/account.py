@@ -17,14 +17,15 @@ class Account(object):
         )
 
     @staticmethod
-    def get_custom_from_addresses(select=1000, skip=0):
+    def get_multiple_custom_from_addresses(select=1000, skip=0):
         """
         Gets all custom from addresses which can be used in a campaign
 
         :return:
         """
         return connection.get(
-            '/v2/custom-from-addresses'
+            '/v2/custom-from-addresses',
+            query_params={'Select': select, 'Skip': skip}
         )
 
     @staticmethod
