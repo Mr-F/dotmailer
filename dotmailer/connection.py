@@ -39,7 +39,7 @@ class DotMailerConnection(object):
     def convert_camel_case_dict(self, data_dict):
         return {
             self.convert_camel_case_key(key): val for key, val in
-        data_dict.items()
+            data_dict.items()
         }
 
     def _do_request(self, method, url, **kwargs):
@@ -83,7 +83,7 @@ class DotMailerConnection(object):
                     ]
 
                 return json_data
-            except json.JSONDecodeError as e:
+            except json.JSONDecodeError:
                 # If requests couldn't decode the JSON then just return
                 # the text output from the response.
                 return response.text
@@ -106,7 +106,7 @@ class DotMailerConnection(object):
 
             exception_class_name = message[
                 message.find('.')+1:
-            ].strip().title().replace('_','')
+            ].strip().title().replace('_', '')
             print "Message =", message
             print "Exception class =", exception_class_name
         raise getattr(exceptions, exception_class_name)()

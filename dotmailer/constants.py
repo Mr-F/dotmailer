@@ -53,7 +53,7 @@ class Constants(object):
 
 
     def __setattr__(self, key, value):
-        if self.__dict__.has_key(key):
+        if key in self.__dict__.keys():
             raise self.ConstError, 'Can\'t rebind constant(%s)'%(key)
         self.__dict__[key] = value
 

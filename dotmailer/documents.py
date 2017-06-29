@@ -9,7 +9,7 @@ class DocumentFolder(Folder):
 
     def get_all_documents(self):
         self.validate_id()
-        response = connection.get('{}/{}/documents'.format(self.id))
+        response = connection.get('{}/{}/documents'.format(self.end_point, self.id))
         return [Document(**entry) for entry in response]
 
 
@@ -31,7 +31,7 @@ class Document(File):
             data['date_created'] = self.strptime(data['date_created'])
         if 'date_modified' in data and not isinstance(data['date_modified'], datetime.datetime):
             data['date_modified'] = self.strptime(data['date_modified'])
-        super(File, self)._update_values(data)
+        super(Document, self)._update_values(data)
 
     def create(self, document_folder):
         if self.file_name is not None:
