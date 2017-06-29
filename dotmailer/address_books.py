@@ -241,9 +241,9 @@ class AddressBook(Base):
         :return:
         """
 
-        self.validate_id('Sorry, unable to add contact to the address book'
-                         ' as no ID value has been defined for the address'
-                         ' book.')
+        self.validate_id('Sorry, unable to add contact to the address book '
+                         'as no ID value has been defined for the address '
+                         'book.')
 
         response = connection.post(
             '{}/{}/contacts'.format(self.end_point, self.id),
@@ -258,17 +258,15 @@ class AddressBook(Base):
         :param contact:
         :return:
         """
-        self.validate_id('Sorry, unable to delete contact from this address'
-                         ' book, as no ID value has been defined for the '
-                         ' address book.')
+        self.validate_id('Sorry, unable to delete contact from this address '
+                         'book, as no ID value has been defined for the '
+                         'address book.')
 
-        contact.validate_id('Sorry, unable to delete this contact from the'
-                            ' address book, as the contact has no ID value.')
+        contact.validate_id('Sorry, unable to delete this contact from the '
+                            'address book, as the contact has no ID value.')
 
-        response = connection.delete(
-            '{}/{}/contacts/{}'.format(
-                self.end_point, self.id, contact.id
-            )
+        connection.delete(
+            '{}/{}/contacts/{}'.format(self.end_point, self.id, contact.id)
         )
 
         return True
@@ -280,13 +278,11 @@ class AddressBook(Base):
         :param id_list:
         :return:
         """
-        self.validate_id('Sorry, unable to delete contacts from this address'
+        self.validate_id('Sorry, unable to delete contacts from this address '
                          'book, as no ID value has been defined for the '
                          'address book.')
-        response = connection.post(
-            '{}/{}/contacts/delete'.format(
-                self.end_point, self.id
-            ),
+        connection.post(
+            '{}/{}/contacts/delete'.format(self.end_point, self.id),
             id_list
         )
 
@@ -297,12 +293,10 @@ class AddressBook(Base):
         :return:
         """
         self.validate_id('Sorry, unable to delete all contacts from this '
-                         'address book, as no ID value has been defined for'
+                         'address book, as no ID value has been defined for '
                          'the address book.')
-        response = connection.delete(
-            '{}/{}/contacts'.format(
-                self.end_point, self.id
-            )
+        connection.delete(
+            '{}/{}/contacts'.format(self.end_point, self.id)
         )
         return True
 

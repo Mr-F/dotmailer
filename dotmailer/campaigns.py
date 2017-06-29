@@ -163,10 +163,8 @@ class Campaign(Base):
         self.validate_id('Sorry, unable to delete this campaign as no ID value'
                          'is defined.')
 
-        response = connection.delete(
-            '{}/{}'.format(
-                self.end_point, self.id
-            )
+        connection.delete(
+            '{}/{}'.format(self.end_point, self.id)
         )
         self.id = None
         return self

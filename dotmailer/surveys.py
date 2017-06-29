@@ -1,7 +1,6 @@
 from dotmailer import Base
 from dotmailer.connection import connection
-from dotmailer.survey_page import SurveyPage
-from dotmailer.survey_fields import SurveyField
+
 
 class Survey(Base):
     """
