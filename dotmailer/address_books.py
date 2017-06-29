@@ -192,7 +192,7 @@ class AddressBook(Base):
         return [cls(**entry) for entry in response]
 
     @classmethod
-    def get_all(cls, type='All'):
+    def get_all(cls, address_book_type='All'):
         """
         Automatically performs all the requests needed to return every
         single address book associated with your account.  This fucntion
@@ -200,14 +200,14 @@ class AddressBook(Base):
         ask for more address books until either none are returned or the
         list returned is shorter than the number being requested.
 
-        :param type: Either 'All', 'Private' or 'Public', depending on
-        if you want every address book, all your private or all your
-        public address books.
+        :param address_book_type: Either 'All', 'Private' or 'Public', 
+        depending on if you want every address book, all your private or 
+        all your public address books.
         :return:
         """
-        if type == 'Private':
+        if address_book_type == 'Private':
             address_book_function = cls.get_private
-        elif type == 'Public':
+        elif address_book_type == 'Public':
             address_book_function = cls.get_public
         else:
             address_book_function = cls.get_multiple
