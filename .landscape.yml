@@ -1,0 +1,7 @@
+strictness: veryhigh
+python-target:
+  - 2
+pep8:
+  full: true
+
+
