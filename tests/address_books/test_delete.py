@@ -27,7 +27,7 @@ def test_delete_valid_address_book(sample_address_book):
     assert sample_address_book.id is None, 'Address book ID was not ' \
                                            'nulled'
 
-    # Finally
+    # Finally, confirm that address book doesn't exists any more
     with pytest.raises(ErrorAddressbookNotFound):
         AddressBook.get_by_id(address_book_id)
 
@@ -42,11 +42,11 @@ def test_delete_invalid_address_book():
 def test_delete_protected_address_book(book_name):
     """
     Test to confirm that if the delete end point is called on one of the
-    protected address books (All Contacts and Test), then the 
+    protected address books (All Contacts and Test), then the
     appropriate exception is raised.
-    
-    :param book_name: 
-    :return: 
+
+    :param book_name:
+    :return:
     """
 
     test_book = None

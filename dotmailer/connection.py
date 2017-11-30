@@ -65,6 +65,8 @@ class DotMailerConnection(object):
             **kwargs
         )
 
+        print response.text
+
         # The response status code was a success then process the
         # response and return to the caller
         if response.ok:

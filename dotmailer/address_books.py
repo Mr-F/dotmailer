@@ -313,3 +313,10 @@ class AddressBook(Base):
         """
 
         return len(value) <= 128
+
+    def __eq__(self, other):
+        return (
+            self.id == other.id and
+            self.name == other.name and
+            self.visibility == other.visibility
+        )
