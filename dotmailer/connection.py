@@ -107,8 +107,6 @@ class DotMailerConnection(object):
             exception_class_name = message[
                 message.find('.')+1:
             ].strip().title().replace('_', '')
-            print "Message =", message
-            print "Exception class =", exception_class_name
         raise getattr(exceptions, exception_class_name)()
 
     def put(self, end_point, payload, **kwargs):

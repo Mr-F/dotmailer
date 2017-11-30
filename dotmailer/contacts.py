@@ -92,7 +92,6 @@ class Contact(Base):
         super(Contact, self).__init__(**kwargs)
 
     def _update_values(self, data):
-        print data
         if 'data_fields' in data:
             # If the data fields is a list then this is likely to be
             # coming back from the server as a list of dictionaries
@@ -139,7 +138,6 @@ class Contact(Base):
 
         :return:
         """
-        print "ID =", self.id
         self.validate_id('Sorry unable to update this contact as no ID value'
                          ' has been defined.')
         response = connection.put(

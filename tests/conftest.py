@@ -7,6 +7,7 @@ from dotmailer.account import Account
 from dotmailer.address_books import AddressBook
 from dotmailer.contacts import Contact
 
+from tests import manually_delete_address_book
 
 def pytest_addoption(parser):
     parser.addini(
@@ -30,12 +31,13 @@ def pytest_collection_modifyitems(config, items):
                 item.add_marker(pytest.mark.skip(reason='Unable to run against DotMailer\'s demo account'))
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope='session', autouse=True)
 def connection(request):
-    Account.setup_connection(
+    return Account.setup_connection(
         username=request.config.getini('username'),
         password=request.config.getini('password')
     )
+
 
 
 @pytest.fixture(scope='session')
@@ -56,9 +58,16 @@ def sample_contact_data():
 
 
 @pytest.fixture(scope='function')
-def sample_address_book(connection, sample_address_book_data):
+def sample_address_book(request, connection, sample_address_book_data):
     sample_address_book = AddressBook(**sample_address_book_data)
     sample_address_book.create()
+
+    # Adding a finalizer so that we can remove the address book
+    # so that it would foul up other test cases or test runs
+    def _finalizer():
+        manually_delete_address_book(connection, sample_address_book)
+    request.addfinalizer(_finalizer)
+
     return sample_address_book
 
 
