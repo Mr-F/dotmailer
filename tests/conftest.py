@@ -47,6 +47,13 @@ def sample_address_book_data():
         'visibility': constants.VISIBILITY_PRIVATE
     }
 
+@pytest.fixture(scope='session')
+def sample_public_address_book_data():
+    return {
+        'name': 'Sample private address book',
+        'visibility': constants.VISIBILITY_PUBLIC
+    }
+
 
 @pytest.fixture(scope='function')
 def sample_contact_data():
@@ -59,16 +66,31 @@ def sample_contact_data():
 
 @pytest.fixture(scope='function')
 def sample_address_book(request, connection, sample_address_book_data):
-    sample_address_book = AddressBook(**sample_address_book_data)
-    sample_address_book.create()
+    address_book = AddressBook(**sample_address_book_data)
+    address_book.create()
 
     # Adding a finalizer so that we can remove the address book so that
     # it would foul up other test cases or test runs.
     def _finalizer():
-        manually_delete_address_book(connection, sample_address_book)
+        manually_delete_address_book(connection, address_book)
     request.addfinalizer(_finalizer)
 
-    return sample_address_book
+    return address_book
+
+
+@pytest.fixture(scope='function')
+def sample_public_address_book(request, connection,
+                                sample_public_address_book_data):
+    address_book = AddressBook(**sample_public_address_book_data)
+    address_book.create()
+
+    # Adding a finalizer so that we can remove the address book so that
+    # it would foul up other test cases or test runs.
+    def _finalizer():
+        manually_delete_address_book(connection, address_book)
+    request.addfinalizer(_finalizer)
+
+    return address_book
 
 
 @pytest.fixture(scope='function')

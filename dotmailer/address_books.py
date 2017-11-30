@@ -173,7 +173,7 @@ class AddressBook(Base):
             cls.end_point + '/private',
             query_params={'Select': select, 'Skip':skip}
         )
-        return [ cls(**entry) for entry in response]
+        return [cls(**entry) for entry in response]
 
     @classmethod
     def get_public(cls, select=1000, skip=0):

@@ -55,7 +55,7 @@ class Base(object):
                 setattr(self, key, value)
 
         elif isinstance(data, tuple):
-            setattr(data[0], data[1])
+            setattr(self, data[0], data[1])
 
     def param_dict(self):
         raise Exception()
