@@ -94,7 +94,12 @@ def sample_public_address_book(request, connection,
 
 
 @pytest.fixture(scope='function')
-def sample_contact(sample_contact_data):
-    sample_contact = Contact(**sample_contact_data)
-    sample_contact.create()
-    return sample_contact
+def sample_contact(request, connection, sample_contact_data):
+    contact = Contact(**sample_contact_data)
+    contact.create()
+
+    def _finalizer():
+        manually_delete_address_book(connection, contact)
+    request.addfinalizer(_finalizer)
+
+    return contact

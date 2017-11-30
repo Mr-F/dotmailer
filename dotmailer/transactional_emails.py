@@ -8,9 +8,9 @@ class TransactionEmail(Base):
     """
 
     end_point = '/v2/email'
-    to_address = []
-    cc_address = []
-    bcc_address = []
+    to_addresses = []
+    cc_addresses = []
+    bcc_addresses = []
     subject = None
     from_address = None
     html_content = None
@@ -18,13 +18,13 @@ class TransactionEmail(Base):
 
     def __init__(self, **kwargs):
         self.required_fields = [
-            'to_address', 'subject', 'from_address', 'html_content',
+            'to_addresses', 'subject', 'from_address', 'html_content',
             'plain_text_content'
         ]
         super(TransactionEmail, self).__init__(**kwargs)
-        self.to_address = self._split_addresses(self.to_address)
-        self.cc_address = self._split_addresses(self.cc_address)
-        self.bcc_address = self._split_addresses(self.bcc_address)
+        self.to_addresses = self._split_addresses(self.to_addresses)
+        self.cc_addresses = self._split_addresses(self.cc_addresses)
+        self.bcc_addresses = self._split_addresses(self.bcc_addresses)
 
     def _split_addresses(self, address_data):
         if not isinstance(address_data, list):
@@ -33,20 +33,21 @@ class TransactionEmail(Base):
 
     def param_dict(self):
         data = {
-            'toAddress': ','.join(self.to_address),
-            'subject': self.subject,
-            'fromAddress': self.from_address,
-            'htmlContent': self.html_content,
-            'plainTextContent': self.plain_text_content
+            'ToAddresses': self.to_addresses,
+            'Subject': self.subject,
+            'FromAddress': self.from_address,
+            'HtmlContent': self.html_content,
+            'PlainTextContent': self.plain_text_content
         }
-        if self.cc_address != []:
-            data['CCAddress'] = ','.join(self.cc_address)
-        if self.bcc_address != []:
-            data['BCCAddress'] = ','.join(self.bcc_address),
+        if self.cc_addresses != []:
+            data['CCAddress'] = self.cc_addresses
+        if self.bcc_addresses != []:
+            data['BCCAddress'] = self.bcc_addresses,
 
         return data
 
     def send(self):
+        print self.param_dict()
         response = connection.post(
             self.end_point,
             self.param_dict()

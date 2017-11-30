@@ -6,7 +6,7 @@ from dotmailer.transactional_emails import TransactionEmail
 def test_valid_send(connection):
 
     test_data = dict(
-        to_address='mr-f@mr-f.org',
+        to_addresses='mr-f@mr-f.org',
         subject='Hello, world!',
         from_address='demo@apiconnector.com',
         html_content='<div>Hello, world!<a href="http://$UNSUB$"> Unsubscribe '
