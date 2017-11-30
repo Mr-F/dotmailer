@@ -36,7 +36,7 @@ def test_get_private_limit(request, connection):
             manually_delete_address_book(connection, book)
     request.addfinalizer(cleanup)
 
-    books = AddressBook.get_public(select=5, skip=offset)
+    books = AddressBook.get_private(select=5, skip=offset)
 
     for book in new_address_books[:5]:
         assert book in books

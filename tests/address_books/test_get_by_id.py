@@ -21,6 +21,6 @@ def test_get_by_valid_id(sample_address_book):
     assert address_book == sample_address_book
 
 
-def test_get_by_invalid_id(id_value):
+def test_get_by_invalid_id():
     with pytest.raises(ErrorAddressbookNotFound):
-        address_book = AddressBook.get_by_id(3278)
+        AddressBook.get_by_id(3278)

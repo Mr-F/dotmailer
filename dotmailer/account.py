@@ -33,7 +33,7 @@ class Account(object):
         all_addresses = []
         select = 1000
         skip = 0
-        addresses = Account.get_custom_from_addresses(select, skip)
+        addresses = Account.get_multiple_custom_from_addresses(select, skip)
         num_of_address = len(addresses)
         while num_of_address > 0:
             all_addresses.extend(addresses)
@@ -42,7 +42,7 @@ class Account(object):
                 break
 
             skip += num_of_address
-            addresses = Account.get_custom_from_addresses(select, skip)
+            addresses = Account.get_multiple_custom_from_addresses(select, skip)
             num_of_address = len(addresses)
 
         return all_addresses

@@ -28,7 +28,7 @@ def test_custom_from_field(connection):
 
     :return:
     """
-    response = Account.get_custom_from_addresses()
+    response = Account.get_all_custom_from_addresses()
     assert isinstance(response, list)
     if len(response) > 0:
         assert 'id' in response[0]
