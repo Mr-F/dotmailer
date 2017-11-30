@@ -21,11 +21,6 @@ def test_get_by_valid_id(sample_address_book):
     assert address_book == sample_address_book
 
 
-@pytest.mark.parametrize('id_value', [
-    3278,
-    'nono',
-    None
-])
 def test_get_by_invalid_id(id_value):
     with pytest.raises(ErrorAddressbookNotFound):
-        address_book = AddressBook.get_by_id(id_value)
+        address_book = AddressBook.get_by_id(3278)
