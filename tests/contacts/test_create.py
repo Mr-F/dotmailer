@@ -38,9 +38,9 @@ def test_create_valid_contact(request, connection, test_data):
     contact.create()
     # This way even if the test fails the test should clean up anything it
     # created for us
-    def cleanup():
-        manually_delete_contact(connection, contact)
-    request.addfinalizer(cleanup)
+    # def cleanup():
+    #     manually_delete_contact(connection, contact)
+    # request.addfinalizer(cleanup)
 
     assert contact.id is not None
     for key, value in test_data.items():

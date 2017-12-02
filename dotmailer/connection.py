@@ -65,7 +65,7 @@ class DotMailerConnection(object):
             **kwargs
         )
 
-        print response.text
+        print "Raw response:", response.text
 
         # The response status code was a success then process the
         # response and return to the caller
@@ -107,7 +107,7 @@ class DotMailerConnection(object):
                 message = message[7:]
 
             exception_class_name = message[
-                message.find('.')+1:
+                message.rfind('.')+1:
             ].strip().title().replace('_', '')
         raise getattr(exceptions, exception_class_name)()
 

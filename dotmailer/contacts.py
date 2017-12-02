@@ -91,6 +91,12 @@ class Contact(Base):
             kwargs['data_fields'] = None
         super(Contact, self).__init__(**kwargs)
 
+    def __repr__(self):
+        return "ID:{}, Email:{}, DataFields:{}".format(
+            self.id,
+            self.email,
+            self.data_fields
+        )
     def _update_values(self, data):
         if 'data_fields' in data:
             # If the data fields is a list then this is likely to be

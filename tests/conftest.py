@@ -7,7 +7,7 @@ from dotmailer.account import Account
 from dotmailer.address_books import AddressBook
 from dotmailer.contacts import Contact
 
-from tests import manually_delete_address_book
+from tests import manually_delete_address_book, manually_delete_contact
 
 def pytest_addoption(parser):
     parser.addini(
@@ -58,7 +58,7 @@ def sample_public_address_book_data():
 @pytest.fixture(scope='function')
 def sample_contact_data():
     return {
-        'email': 'sample_user@test.com',
+        'email': 'test0@test.com',
         'opt_in_type': constants.CONTACT_OPTINTYPE_UNKNOWN,
         'email_type': constants.CONTACT_EMAILTYPE_HTML
     }
@@ -98,8 +98,10 @@ def sample_contact(request, connection, sample_contact_data):
     contact = Contact(**sample_contact_data)
     contact.create()
 
+    print "Contact created", contact.id
     def _finalizer():
-        manually_delete_address_book(connection, contact)
+        print "Trying to delete contact"
+        manually_delete_contact(connection, contact)
     request.addfinalizer(_finalizer)
 
     return contact
