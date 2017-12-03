@@ -295,7 +295,7 @@ class Campaign(Base):
             self.name == other.name and
             self.subject == other.subject and
             self.from_name == other.from_name and
-            self.from_address == other.from_name and
+            self.from_address == other.from_address and
             self.html_content == other.html_content and
             self.plain_text_content == other.plain_text_content and
             self.reply_action == other.reply_action and
