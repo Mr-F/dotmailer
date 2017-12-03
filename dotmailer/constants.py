@@ -51,6 +51,9 @@ class Constants(object):
         self.SEGMENT_STATUS_FAILED = 'Failed'
         self.SEGMENT_STATUS_NOTAVAILABLEINTHISVERSION = 'NotAvailableInThisVersion'
 
+        self.UNSUB_HTML_STRING = '<a href="http://$UNSUB$">Unsubscribe</a>'
+        self.UNSUB_PLAIN_TEXT_STRING = '$UNSUB$'
+
 
     def __setattr__(self, key, value):
         if key in self.__dict__.keys():

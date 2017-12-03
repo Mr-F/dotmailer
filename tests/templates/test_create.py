@@ -26,7 +26,6 @@ def test_create_required_keys(template_data, error_msg):
     with pytest.raises(KeyError, message=error_msg) as e:
         template = Template(**template_data)
         template.create()
-    print e.__dict__
     assert e.value.message == error_msg
 
 @pytest.mark.parametrize('template_data, error_msg', [
@@ -42,8 +41,7 @@ def test_create_required_keys(template_data, error_msg):
      'The template is not valid. This means that there is something incorrect with the template object you are sending to the method/operation. Check that your template object is valid by checking the definition in the documentation.'),
 ])
 def test_create_invalid_template(template_data, error_msg):
+    template = Template(**template_data)
     with pytest.raises(ErrorTemplateInvalid, message=error_msg) as e:
-        template = Template(**template_data)
         template.create()
-    print e.__dict__
     assert e.value.message == error_msg

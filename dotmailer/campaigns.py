@@ -115,6 +115,9 @@ class Campaign(Base):
             self.end_point,
             self.param_dict()
         )
+
+        print '*' * 100
+        print response
         self._update_values(response)
         return self
 
@@ -148,9 +151,10 @@ class Campaign(Base):
             raise Exception()
 
         response = connection.post(
-            '{}/{}'.format(
+            '{}/{}/copy'.format(
                 cls.end_point, id
-            )
+            ),
+            {}
         )
         return cls(**response)
 
@@ -250,6 +254,19 @@ class Campaign(Base):
         return self
 
     @classmethod
+    def get_by_id(cls, id):
+        id = int(id)
+
+        if id < 1:
+            raise Exception()
+
+        response = connection.get(
+            '{}/{}'.format(cls.end_point, id)
+        )
+        return cls(**response)
+
+
+    @classmethod
     def get_all(cls):
         """Gets all campaigns
 
@@ -271,3 +288,17 @@ class Campaign(Base):
             skip += select
 
         return all_campaigns
+
+    def __eq__(self, other):
+        return (
+            self.id == other.id and
+            self.name == other.name and
+            self.subject == other.subject and
+            self.from_name == other.from_name and
+            self.from_address == other.from_name and
+            self.html_content == other.html_content and
+            self.plain_text_content == other.plain_text_content and
+            self.reply_action == other.reply_action and
+            self.reply_address == other.reply_address and
+            self.status == other.status
+        )

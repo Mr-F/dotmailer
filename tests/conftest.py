@@ -2,14 +2,17 @@ import pytest
 import ConfigParser
 import os
 
-from dotmailer.constants import constants
 from dotmailer.account import Account
 from dotmailer.address_books import AddressBook
+from dotmailer.campaigns import Campaign
+from dotmailer.constants import constants
 from dotmailer.contacts import Contact
 from dotmailer.templates import Template
 
+from tests.campaigns import sample_campaign_data
 from tests.templates import sample_template_data
-from tests import manually_delete_address_book, manually_delete_contact
+from tests import manually_delete_address_book, manually_delete_contact, \
+    manually_delete_campaign
 
 def pytest_addoption(parser):
     parser.addini(
@@ -22,6 +25,10 @@ def pytest_addoption(parser):
         'DotMailer API account password',
         default='demo'
     )
+    parser.addini(
+        'from_address',
+        'The from_address specified in your DotMailer account'
+    )
 
 
 def pytest_collection_modifyitems(config, items):
@@ -31,6 +38,11 @@ def pytest_collection_modifyitems(config, items):
         for item in items:
             if item.get_marker("notdemo"):
                 item.add_marker(pytest.mark.skip(reason='Unable to run against DotMailer\'s demo account'))
+
+
+@pytest.fixture(scope='session')
+def account_from_address(request):
+    return request.config.getini('from_address')
 
 
 @pytest.fixture(scope='session', autouse=True)
@@ -116,3 +128,17 @@ def sample_template(request, connection):
     # no rollback finalizer to add here.
 
     return template
+
+
+@pytest.fixture(scope='function')
+def sample_campaign(request, connection, account_from_address):
+    data = sample_campaign_data()
+    data['from_address']['email'] = account_from_address
+    campaign = Campaign(**data)
+    campaign.create()
+
+    def _finalizer():
+        manually_delete_campaign(connection, campaign)
+    request.addfinalizer(_finalizer)
+
+    return campaign
