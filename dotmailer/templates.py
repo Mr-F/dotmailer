@@ -144,3 +144,12 @@ class Template(Base):
             num_of_templates = len(templates)
 
         return all_templates
+
+    def __eq__(self, other):
+        return (
+            self.id == other.id and
+            self.name == other.name and
+            self.subject == other.subject and
+            self.html_content == other.html_content and
+            self.plain_text_content == other.plain_text_content
+        )

@@ -6,7 +6,9 @@ from dotmailer.constants import constants
 from dotmailer.account import Account
 from dotmailer.address_books import AddressBook
 from dotmailer.contacts import Contact
+from dotmailer.templates import Template
 
+from tests.templates import sample_template_data
 from tests import manually_delete_address_book, manually_delete_contact
 
 def pytest_addoption(parser):
@@ -98,10 +100,19 @@ def sample_contact(request, connection, sample_contact_data):
     contact = Contact(**sample_contact_data)
     contact.create()
 
-    print "Contact created", contact.id
     def _finalizer():
-        print "Trying to delete contact"
         manually_delete_contact(connection, contact)
     request.addfinalizer(_finalizer)
 
     return contact
+
+
+@pytest.fixture(scope='function')
+def sample_template(request, connection):
+    template = Template(**sample_template_data())
+    template.create()
+
+    # Currently DotMailer's API doesn't support deletion of templates so
+    # no rollback finalizer to add here.
+
+    return template

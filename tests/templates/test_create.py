@@ -3,16 +3,10 @@ import pytest
 from dotmailer.exceptions import ErrorTemplateInvalid
 from dotmailer.templates import Template
 
+from tests.templates import sample_template_data
 
 def test_create_valid_template():
-    data = {
-        'name': 'Test create template',
-        'subject': 'Test creat template',
-        'from_name': 'Tester',
-        'html_content': '<p>Test Content</p><a href="http://$UNSUB$" style="color: black;"> Unsubscribe from this newsletter</a>',
-        'plain_text_content': 'Test Content $UNSUB$'
-    }
-
+    data = sample_template_data()
     template = Template(**data)
     assert template.id is None
     template.create()
