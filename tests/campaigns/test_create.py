@@ -3,16 +3,21 @@ import pytest
 from dotmailer.campaigns import Campaign
 from dotmailer.exceptions import ErrorCampaignInvalid
 
+from tests import manually_delete_campaign
 from tests.campaigns import sample_campaign_data
 
 
-def test_create_valid(account_from_address):
+def test_create_valid(request, connection, account_from_address):
     data = sample_campaign_data()
     data['from_address']['email'] = account_from_address
     campaign = Campaign(**data)
     assert campaign.id is None
 
     campaign.create()
+
+    def cleanup():
+        manually_delete_campaign(connection, campaign)
+    request.addfinalizer(cleanup)
     assert campaign.id is not None
     for key, value in data.items():
         if key != 'from_address':

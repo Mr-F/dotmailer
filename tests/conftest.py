@@ -6,13 +6,15 @@ from dotmailer.account import Account
 from dotmailer.address_books import AddressBook
 from dotmailer.campaigns import Campaign
 from dotmailer.constants import constants
+from dotmailer.contact_data_fields import ContactDataField
 from dotmailer.contacts import Contact
 from dotmailer.templates import Template
 
 from tests.campaigns import sample_campaign_data
+from tests.contact_data_fields import sample_contact_data_field_data
 from tests.templates import sample_template_data
 from tests import manually_delete_address_book, manually_delete_contact, \
-    manually_delete_campaign
+    manually_delete_campaign, manually_delete_contact_data_field
 
 def pytest_addoption(parser):
     parser.addini(
@@ -142,3 +144,14 @@ def sample_campaign(request, connection, account_from_address):
     request.addfinalizer(_finalizer)
 
     return campaign
+
+
+@pytest.fixture(scope='function')
+def sample_contact_data_field(request, connection):
+    contact_data_field = ContactDataField(**sample_contact_data_field_data())
+    contact_data_field.create()
+    def _finalizer():
+        manually_delete_contact_data_field(connection, contact_data_field)
+    request.addfinalizer(_finalizer)
+
+    return contact_data_field

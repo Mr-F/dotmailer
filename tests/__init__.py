@@ -1,3 +1,5 @@
+from dotmailer.exceptions import ErrorDatafieldNotfound
+
 def manually_delete_address_book(connection, address_book):
     if address_book.id is not None:
         # Attempt to remove the created address book
@@ -14,3 +16,9 @@ def manually_delete_campaign(connection, campaign):
     if campaign.id is not None:
         # Attempt to remove the created campaign
         connection.delete('/v2/campaigns/{}'.format(campaign.id))
+
+def manually_delete_contact_data_field(connection, contact_data_field):
+    try:
+        connection.delete('/v2/data-fields/{}'.format(contact_data_field.name))
+    except ErrorDatafieldNotfound as e:
+        pass

@@ -5,6 +5,7 @@ from dotmailer.connection import connection
 
 name_re = re.compile('[^a-zA-Z0-9_\-]')
 
+
 class ContactDataField(Base):
 
     invalid_name_msg = 'Invalid contact data field name.  Please refer to ' \
@@ -16,12 +17,10 @@ class ContactDataField(Base):
     default_value = None
 
     def __init__(self, **kwargs):
-        self.required_fields = ['name']
+        self.required_fields = ['name', 'type']
 
         # Setup the other optional fields to the default value if they have not
         # been specified.
-        if 'type' not in kwargs:
-            kwargs['type'] =  constants.TYPE_STRING
         if 'visibility' not in kwargs:
             kwargs['visibility'] = constants.VISIBILITY_PRIVATE
         if 'default_value' not in kwargs:
@@ -124,8 +123,8 @@ class ContactDataField(Base):
         """
         # Check that the name does not exceed the maximum length allowed by
         # dotmailer.
-        if len(value) > 20:
-            return False,
+        if len(value) > 20 or len(value) < 1:
+            return False
 
         # Confirm that the name only contains valid characters based upon
         # dotmailer's specification.
