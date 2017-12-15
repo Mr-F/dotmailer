@@ -95,7 +95,7 @@ class Folder(Base):
 
     parent_id = None
     name = None
-    child_folder = None
+    child_folders = None
 
     def __init__(self, **kwargs):
         self.required_fields = ['name', 'parent_id']
@@ -110,17 +110,29 @@ class Folder(Base):
 
     def create(self):
         response = connection.post(
-            '{}/{}'.format(self.end_point, self.parent_id)
+            '{}/{}'.format(self.end_point, self.parent_id),
+            self.param_dict()
         )
         self._update_values(response)
 
     @classmethod
-    def get(cls):
+    def get_all(cls):
         response = connection.get(
-            '{}'.foramt(cls.end_point)
+            '{}'.format(cls.end_point)
         )
-        # TODO: Implement this bit to recursively convert all the elements and child_folders into document folder objects
-        return response
+
+        def _recursive_convert(entity):
+            folder = cls(**entity)
+            child_folders = entity.get('child_folders')
+            if child_folders is not None and child_folders != []:
+                folder.child_folders = []
+                for child in child_folders:
+                    folder.child_folders.append(
+                        _recursive_convert(child)
+                    )
+            return folder
+
+        return [_recursive_convert(entry) for entry in response]
 
 
 class File(Base):

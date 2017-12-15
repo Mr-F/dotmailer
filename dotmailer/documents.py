@@ -1,16 +1,6 @@
 import datetime
-from dotmailer import Folder, File
-from dotmailer.connection import connection
 
-
-class DocumentFolder(Folder):
-
-    end_point = '/v2/document-folders'
-
-    def get_all_documents(self):
-        self.validate_id()
-        response = connection.get('{}/{}/documents'.format(self.end_point, self.id))
-        return [Document(**entry) for entry in response]
+from dotmailer import File, connection
 
 
 class Document(File):
@@ -37,3 +27,16 @@ class Document(File):
         if self.file_name is not None:
             raise Exception('Document has already been uploaded to DotMailer')
         return self._create(document_folder)
+
+    @classmethod
+    def get_all(cls, document_folder_id):
+        """
+        Gets all uploaded documents in a given folder.
+
+        :param document_folder_id: The ID of the folder
+        :return:
+        """
+        response = connection.get(
+            '{}/{}/documents'.format(cls.end_point, document_folder_id)
+        )
+        return [Document(**entry) for entry in response]
