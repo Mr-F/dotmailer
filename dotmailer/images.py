@@ -1,18 +1,5 @@
-from dotmailer import Folder, File
-from dotmailer.connection import connection
+from dotmailer import File
 
-
-class ImageFolder(Folder):
-
-    end_point = '/v2/image-folders'
-
-    @classmethod
-    def get_by_id(cls, id):
-        response = connection.get(
-            '{}/{}'.format(cls.end_point, id)
-        )
-        # TODO: Implement this bit to recursively convert all the elements and child_folders into document folder objects
-        return response
 
 class Image(File):
 
